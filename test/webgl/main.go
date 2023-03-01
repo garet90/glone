@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"gfx.cafe/ghalliday1/glone"
+	"gfx.cafe/ghalliday1/glone/dedup"
 	"gfx.cafe/ghalliday1/glone/webgl"
 	"math"
 	"strings"
@@ -29,7 +30,7 @@ func main() {
 	width := canvas.Get("width").Int()
 	height := canvas.Get("height").Int()
 
-	gl := webgl.NewRenderingContext(renderingContext)
+	gl := dedup.NewRenderingContext(webgl.NewRenderingContext(renderingContext))
 
 	// create shaders
 	vertex := gl.CreateShader(glone.VERTEX_SHADER)

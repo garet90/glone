@@ -14,10 +14,15 @@ type RenderingContext struct {
 	methods map[string]js.Value
 }
 
-func NewRenderingContext(value js.Value) *RenderingContext {
-	return &RenderingContext{
+func MakeRenderingContext(value js.Value) RenderingContext {
+	return RenderingContext{
 		value: value,
 	}
+}
+
+func NewRenderingContext(value js.Value) *RenderingContext {
+	rc := MakeRenderingContext(value)
+	return &rc
 }
 
 var (
