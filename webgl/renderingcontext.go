@@ -4,7 +4,9 @@ package webgl
 
 import (
 	"gfx.cafe/ghalliday1/glone"
+	"reflect"
 	"syscall/js"
+	"unsafe"
 )
 
 type RenderingContext struct {
@@ -17,6 +19,16 @@ func NewRenderingContext(value js.Value) *RenderingContext {
 		value: value,
 	}
 }
+
+var (
+	valueGlobal = js.Global()
+
+	arrayConstructor        = valueGlobal.Get("Array")
+	uint8ArrayConstructor   = valueGlobal.Get("Uint8Array")
+	float32ArrayConstructor = valueGlobal.Get("Float32Array")
+	int32ArrayConstructor   = valueGlobal.Get("Int32Array")
+	uint32ArrayConstructor  = valueGlobal.Get("Uint32Array")
+)
 
 func castToAny(value js.Value) any {
 	switch value.Type() {
@@ -33,36 +45,80 @@ func castToAny(value js.Value) any {
 	}
 }
 
-func makeByteArray(v []byte) js.Value {
+func makeByteArrayLength(length int) js.Value {
+	return uint8ArrayConstructor.New(length)
+}
 
+func makeByteArray(v []byte) js.Value {
+	array := makeByteArrayLength(len(v))
+	js.CopyBytesToJS(array, v)
+	return array
+}
+
+func unsafeReslice[T, U any](v []T) []U {
+	tSize := unsafe.Sizeof(*new(T))
+	uSize := unsafe.Sizeof(*new(U))
+	slice := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+	return unsafe.Slice((*U)(unsafe.Pointer(slice.Data)), (int(tSize)*slice.Len)/int(uSize))
 }
 
 func makeFloat32Array(v []float32) js.Value {
-
+	array := makeByteArray(unsafeReslice[float32, byte](v))
+	return float32ArrayConstructor.New(array.Get("buffer"))
 }
 
 func makeInt32Array(v []int32) js.Value {
-
+	array := makeByteArray(unsafeReslice[int32, byte](v))
+	return int32ArrayConstructor.New(array.Get("buffer"))
 }
 
 func makeUint32Array(v []uint32) js.Value {
-
+	array := makeByteArray(unsafeReslice[uint32, byte](v))
+	return uint32ArrayConstructor.New(array.Get("buffer"))
 }
 
 func makeUintArray(v []uint) js.Value {
-
+	array := arrayConstructor.New(len(v))
+	for i, val := range v {
+		array.SetIndex(i, val)
+	}
+	return array
 }
 
 func makeEnumArray(v []glone.Enum) js.Value {
-
+	array := arrayConstructor.New(len(v))
+	for i, val := range v {
+		array.SetIndex(i, val)
+	}
+	return array
 }
 
 func makeStringArray(v []string) js.Value {
-
+	array := arrayConstructor.New(len(v))
+	for i, val := range v {
+		array.SetIndex(i, val)
+	}
+	return array
 }
 
 func getUintArray(v js.Value) []uint {
+	length := v.Get("length").Int()
+	array := make([]uint, length)
+	for i := 0; i < length; i++ {
+		array[i] = uint(v.Index(i).Int())
+	}
+	return array
+}
 
+func getShaderArray(v js.Value) []glone.Shader {
+	length := v.Get("length").Int()
+	array := make([]glone.Shader, length)
+	for i := 0; i < length; i++ {
+		array[i] = Shader{
+			v.Index(i),
+		}
+	}
+	return array
 }
 
 func (R *RenderingContext) call(method string, args ...any) js.Value {
@@ -405,15 +461,7 @@ func (R *RenderingContext) GetActiveUniform(program glone.Program, index uint) g
 
 func (R *RenderingContext) GetAttachedShaders(program glone.Program) []glone.Shader {
 	p := programOrNil(program)
-	shaders := R.call("getAttachedShaders", p)
-	shadersLength := shaders.Get("length").Int()
-	out := make([]glone.Shader, shadersLength)
-	for i := 0; i < shadersLength; i++ {
-		out[i] = Shader{
-			shaders.Index(i),
-		}
-	}
-	return out
+	return getShaderArray(R.call("getAttachedShaders", p))
 }
 
 func (R *RenderingContext) GetAttribLocation(program glone.Program, name string) int {
@@ -754,8 +802,9 @@ func (R *RenderingContext) ReadPixelsOff(x, y, width, height int, format, typ gl
 }
 
 func (R *RenderingContext) ReadPixelsPix(x, y, width, height int, format, typ glone.Enum, dstData []byte) {
-	//TODO implement me
-	panic("implement me")
+	dst := makeByteArrayLength(len(dstData))
+	R.call("readPixels", x, y, width, height, format, typ, dst)
+	js.CopyBytesToGo(dstData, dst)
 }
 
 func (R *RenderingContext) DrawBuffers(buffers []glone.Enum) {
@@ -809,8 +858,9 @@ func (R *RenderingContext) CopyBufferSubData(readTarget, writeTarget glone.Enum,
 }
 
 func (R *RenderingContext) GetBufferSubData(target glone.Enum, srcByteOffset int, dstBuffer []byte) {
-	//TODO implement me
-	panic("implement me")
+	dst := makeByteArrayLength(len(dstBuffer))
+	R.call("getBufferSubData", target, srcByteOffset, dst)
+	js.CopyBytesToGo(dstBuffer, dst)
 }
 
 func (R *RenderingContext) ActiveTexture(texture glone.Enum) {
