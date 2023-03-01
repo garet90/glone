@@ -57,6 +57,7 @@ type RenderingContext interface {
 	IsTransformFeedback(tf TransformFeedback) bool
 	IsSampler(sampler Sampler) bool
 	IsQuery(query Query) bool
+	IsSync(sync Sync) bool
 
 	/* Object Deletion */
 
@@ -70,6 +71,7 @@ type RenderingContext interface {
 	DeleteTransformFeedback(tf TransformFeedback)
 	DeleteSampler(sampler Sampler)
 	DeleteQuery(query Query)
+	DeleteSync(sync Sync)
 
 	/* Shader Methods */
 
@@ -83,6 +85,8 @@ type RenderingContext interface {
 	/* Program Methods */
 
 	AttachShader(program Program, shader Shader)
+	DetachShader(program Program, shader Shader)
+	LinkProgram(program Program)
 	ValidateProgram(program Program)
 	UseProgram(program Program)
 	GetActiveAttrib(program Program, index uint) ActiveInfo
@@ -156,8 +160,9 @@ type RenderingContext interface {
 	VertexAttrib4fv(index uint, values []float32)
 
 	VertexAttribI4i(index uint, x, y, z, w int)
-	VertexAttribI4iv(index uint, values []int32)
 	VertexAttribI4ui(index, x, y, z, w uint)
+
+	VertexAttribI4iv(index uint, values []int32)
 	VertexAttribI4uiv(index uint, values []uint32)
 
 	VertexAttribPointer(index uint, size int, typ Enum, normalized bool, stride, offset int)
@@ -173,7 +178,7 @@ type RenderingContext interface {
 	FramebufferRenderbuffer(target, attachment, renderbuffertarget Enum, renderbuffer Renderbuffer)
 	FramebufferTexture2D(target, attachment, textarget Enum, texture Texture, level int)
 	CheckFramebufferStatus(target Enum) Enum
-	GetFramebufferAttachmentParameter(target, attachnemt, pname Enum) any
+	GetFramebufferAttachmentParameter(target, attachment, pname Enum) any
 	BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1 int, mask, filter Enum)
 	FramebufferTextureLayer(target, attachment Enum, texture Texture, level, layer int)
 	InvalidateFramebuffer(target Enum, attachments []Enum)
@@ -205,7 +210,7 @@ type RenderingContext interface {
 	BufferDataSize(target Enum, size int, usage Enum)
 	BufferDataSrc(target Enum, data BufferSource, usage Enum)
 	BufferDataPix(target Enum, srcData []byte, usage Enum)
-	BufferSubDataSrc(target Enum, offset int, date BufferSource)
+	BufferSubDataSrc(target Enum, offset int, data BufferSource)
 	BufferSubDataPix(target Enum, dstByteOffset int, srcData []byte)
 	GetBufferParameter(target, pname Enum) any
 	CopyBufferSubData(readTarget, writeTarget Enum, readOffset, writeOffset, size int)
@@ -220,7 +225,7 @@ type RenderingContext interface {
 	GetTexParameter(target, pname Enum) any
 	GenerateMipmap(target Enum)
 
-	CopyTexImage2D(target Enum, level int, internalFormat Enum, x, y, width, height, border int)
+	CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, height, border int)
 	CopyTexSubImage2D(target Enum, level int, xoffset, yoffset, x, y, width, height int)
 
 	TexStorage2D(target Enum, levels int, internalformat Enum, width, height int)
@@ -272,8 +277,6 @@ type RenderingContext interface {
 	/* Sync Methods */
 
 	FenceSync(condition, flags Enum) Sync
-	IsSync(sync Sync) bool
-	DeleteSync(sync Sync)
 	ClientWaitSync(sync Sync, flags Enum, timeout uint)
 	WaitSync(sync Sync, flags Enum, timeout int)
 	GetSyncParameter(sync Sync, pname Enum) any
@@ -319,12 +322,10 @@ type RenderingContext interface {
 	DepthFunc(fun Enum)
 	DepthMask(flag bool)
 	DepthRange(zNear, zFar float64)
-	DetachShader(program Program, shader Shader)
 	Disable(cap Enum)
 	Enable(cap Enum)
 	Hint(target, mode Enum)
 	LineWidth(width float64)
-	LinkProgram(program Program)
 	PixelStorei(pname Enum, param int)
 	PolygonOffset(factor, units float64)
 	StencilFunc(fun Enum, ref int, mask uint)
