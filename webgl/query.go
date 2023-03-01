@@ -9,6 +9,8 @@ type Query struct {
 	value js.Value
 }
 
+func (Query) GLOneQuery() {}
+
 func queryOrNil(v glone.Query) any {
 	vv, ok := v.(Query)
 	if !ok {

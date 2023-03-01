@@ -9,6 +9,8 @@ type TexImageSource struct {
 	value js.Value
 }
 
+func (TexImageSource) GLOneTexImageSource() {}
+
 func texImageSourceOrNil(v glone.TexImageSource) any {
 	vv, ok := v.(TexImageSource)
 	if !ok {

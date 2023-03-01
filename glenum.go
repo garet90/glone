@@ -1,6 +1,6 @@
 package glone
 
-type Enum int
+type Enum int32
 
 const (
 	/* ClearBufferMask */

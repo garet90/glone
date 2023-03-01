@@ -9,6 +9,8 @@ type Shader struct {
 	value js.Value
 }
 
+func (Shader) GLOneShader() {}
+
 func shaderOrNil(v glone.Shader) any {
 	vv, ok := v.(Shader)
 	if !ok {

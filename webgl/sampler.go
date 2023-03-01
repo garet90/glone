@@ -9,6 +9,8 @@ type Sampler struct {
 	value js.Value
 }
 
+func (Sampler) GLOneSampler() {}
+
 func samplerOrNil(v glone.Sampler) any {
 	vv, ok := v.(Sampler)
 	if !ok {

@@ -9,6 +9,8 @@ type BufferSource struct {
 	value js.Value
 }
 
+func (BufferSource) GLOneBufferSource() {}
+
 func bufferSourceOrNil(v glone.BufferSource) any {
 	vv, ok := v.(BufferSource)
 	if !ok {

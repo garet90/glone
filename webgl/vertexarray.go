@@ -9,6 +9,8 @@ type VertexArray struct {
 	value js.Value
 }
 
+func (VertexArray) GLOneVertexArray() {}
+
 func vertexArrayOrNil(v glone.VertexArray) any {
 	vv, ok := v.(VertexArray)
 	if !ok {

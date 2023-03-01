@@ -9,6 +9,8 @@ type Buffer struct {
 	value js.Value
 }
 
+func (Buffer) GLOneBuffer() {}
+
 func bufferOrNil(v glone.Buffer) any {
 	vv, ok := v.(Buffer)
 	if !ok {

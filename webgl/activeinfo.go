@@ -9,6 +9,8 @@ type ActiveInfo struct {
 	value js.Value
 }
 
+func (ActiveInfo) GLOneActiveInfo() {}
+
 func activeInfoOrNil(v glone.ActiveInfo) any {
 	vv, ok := v.(ActiveInfo)
 	if !ok {

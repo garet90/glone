@@ -9,6 +9,8 @@ type Texture struct {
 	value js.Value
 }
 
+func (Texture) GLOneTexture() {}
+
 func textureOrNil(v glone.Texture) any {
 	vv, ok := v.(Texture)
 	if !ok {

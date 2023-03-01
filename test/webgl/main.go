@@ -72,14 +72,29 @@ func main() {
 	if vertexPositionLocation < 0 {
 		panic("couldn't find vertex_position")
 	}
+	vertexColorLocation := gl.GetAttribLocation(program, "vertex_color")
+	if vertexColorLocation < 0 {
+		panic("couldn't find vertex_color")
+	}
 
 	var b []byte
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(-0.5))
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(-0.5))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(1.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0))
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.5))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(1.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.5))
 	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(-0.5))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(0.0))
+	b = binary.LittleEndian.AppendUint32(b, math.Float32bits(1.0))
 
 	// create buffer
 	buffer := gl.CreateBuffer()
@@ -89,14 +104,16 @@ func main() {
 	// create vao
 	vao := gl.CreateVertexArray()
 	gl.BindVertexArray(vao)
-	gl.VertexAttribPointer(uint(vertexPositionLocation), 2, glone.FLOAT, false, 0, 0)
-	gl.EnableVertexAttribArray(uint(vertexPositionLocation))
+	gl.VertexAttribPointer(uint32(vertexPositionLocation), 2, glone.FLOAT, false, 20, 0)
+	gl.VertexAttribPointer(uint32(vertexColorLocation), 3, glone.FLOAT, false, 20, 8)
+	gl.EnableVertexAttribArray(uint32(vertexPositionLocation))
+	gl.EnableVertexAttribArray(uint32(vertexColorLocation))
 
 	// clear canvas
 	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(glone.COLOR_BUFFER_BIT | glone.DEPTH_BUFFER_BIT)
 
-	gl.Viewport(0, 0, width, height)
+	gl.Viewport(0, 0, int32(width), int32(height))
 
 	// draw!
 	gl.DrawArrays(glone.TRIANGLES, 0, 3)

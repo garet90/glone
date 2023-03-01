@@ -9,6 +9,8 @@ type Framebuffer struct {
 	value js.Value
 }
 
+func (Framebuffer) GLOneFramebuffer() {}
+
 func framebufferOrNil(v glone.Framebuffer) any {
 	vv, ok := v.(Framebuffer)
 	if !ok {

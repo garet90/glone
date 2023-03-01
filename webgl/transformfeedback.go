@@ -9,6 +9,8 @@ type TransformFeedback struct {
 	value js.Value
 }
 
+func (TransformFeedback) GLOneTransformFeedback() {}
+
 func transformFeedbackOrNil(v glone.TransformFeedback) any {
 	vv, ok := v.(TransformFeedback)
 	if !ok {

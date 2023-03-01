@@ -9,6 +9,8 @@ type Program struct {
 	value js.Value
 }
 
+func (Program) GLOneProgram() {}
+
 func programOrNil(v glone.Program) any {
 	vv, ok := v.(Program)
 	if !ok {

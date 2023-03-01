@@ -82,7 +82,7 @@ func makeUint32Array(v []uint32) js.Value {
 	return uint32ArrayConstructor.New(array.Get("buffer"))
 }
 
-func makeUintArray(v []uint) js.Value {
+func makeUintArray(v []uint32) js.Value {
 	array := arrayConstructor.New(len(v))
 	for i, val := range v {
 		array.SetIndex(i, val)
@@ -93,7 +93,7 @@ func makeUintArray(v []uint) js.Value {
 func makeEnumArray(v []glone.Enum) js.Value {
 	array := arrayConstructor.New(len(v))
 	for i, val := range v {
-		array.SetIndex(i, int(val))
+		array.SetIndex(i, int32(val))
 	}
 	return array
 }
@@ -106,11 +106,11 @@ func makeStringArray(v []string) js.Value {
 	return array
 }
 
-func getUintArray(v js.Value) []uint {
+func getUintArray(v js.Value) []uint32 {
 	length := v.Get("length").Int()
-	array := make([]uint, length)
+	array := make([]uint32, length)
 	for i := 0; i < length; i++ {
-		array[i] = uint(v.Index(i).Int())
+		array[i] = uint32(v.Index(i).Int())
 	}
 	return array
 }
@@ -127,7 +127,6 @@ func getShaderArray(v js.Value) []glone.Shader {
 }
 
 func (R *RenderingContext) call(method string, args ...any) js.Value {
-	return R.value.Call(method, args...)
 	if R.methods == nil {
 		R.methods = make(map[string]js.Value)
 	} else {
@@ -137,7 +136,7 @@ func (R *RenderingContext) call(method string, args ...any) js.Value {
 		}
 	}
 	m := R.value.Get(method)
-	m.Call("bind", R.value)
+	m = m.Call("bind", R.value)
 	R.methods[method] = m
 	return m.Invoke(args...)
 }
@@ -175,7 +174,7 @@ func (R *RenderingContext) CreateRenderbuffer() glone.Renderbuffer {
 }
 
 func (R *RenderingContext) CreateShader(typ glone.Enum) glone.Shader {
-	v := R.call("createShader", int(typ))
+	v := R.call("createShader", int32(typ))
 	if v.IsNull() {
 		return nil
 	}
@@ -222,39 +221,39 @@ func (R *RenderingContext) CreateQuery() glone.Query {
 	return Query{v}
 }
 
-func (R *RenderingContext) BindAttribLocation(program glone.Program, index uint, name string) {
+func (R *RenderingContext) BindAttribLocation(program glone.Program, index uint32, name string) {
 	p := programOrNil(program)
 	R.call("bindAttribLocation", p, index, name)
 }
 
 func (R *RenderingContext) BindBuffer(target glone.Enum, buffer glone.Buffer) {
 	b := bufferOrNil(buffer)
-	R.call("bindBuffer", int(target), b)
+	R.call("bindBuffer", int32(target), b)
 }
 
-func (R *RenderingContext) BindBufferBase(target glone.Enum, index uint, buffer glone.Buffer) {
+func (R *RenderingContext) BindBufferBase(target glone.Enum, index uint32, buffer glone.Buffer) {
 	b := bufferOrNil(buffer)
-	R.call("bindBufferBase", int(target), index, b)
+	R.call("bindBufferBase", int32(target), index, b)
 }
 
-func (R *RenderingContext) BindBufferRange(target glone.Enum, index uint, buffer glone.Buffer, offset, size int) {
+func (R *RenderingContext) BindBufferRange(target glone.Enum, index uint32, buffer glone.Buffer, offset, size int32) {
 	b := bufferOrNil(buffer)
-	R.call("bindBufferRange", int(target), index, b, offset, size)
+	R.call("bindBufferRange", int32(target), index, b, offset, size)
 }
 
 func (R *RenderingContext) BindFramebuffer(target glone.Enum, framebuffer glone.Framebuffer) {
 	f := framebufferOrNil(framebuffer)
-	R.call("bindFramebuffer", int(target), f)
+	R.call("bindFramebuffer", int32(target), f)
 }
 
 func (R *RenderingContext) BindRenderbuffer(target glone.Enum, renderbuffer glone.Renderbuffer) {
 	r := renderbufferOrNil(renderbuffer)
-	R.call("bindRenderbuffer", int(target), r)
+	R.call("bindRenderbuffer", int32(target), r)
 }
 
 func (R *RenderingContext) BindTexture(target glone.Enum, texture glone.Texture) {
 	t := textureOrNil(texture)
-	R.call("bindTexture", int(target), t)
+	R.call("bindTexture", int32(target), t)
 }
 
 func (R *RenderingContext) BindVertexArray(array glone.VertexArray) {
@@ -264,10 +263,10 @@ func (R *RenderingContext) BindVertexArray(array glone.VertexArray) {
 
 func (R *RenderingContext) BindTransformFeedback(target glone.Enum, tf glone.TransformFeedback) {
 	t := transformFeedbackOrNil(tf)
-	R.call("bindTransformFeedback", int(target), t)
+	R.call("bindTransformFeedback", int32(target), t)
 }
 
-func (R *RenderingContext) BindSampler(unit uint, sampler glone.Sampler) {
+func (R *RenderingContext) BindSampler(unit uint32, sampler glone.Sampler) {
 	s := samplerOrNil(sampler)
 	R.call("bindSampler", unit, s)
 }
@@ -278,7 +277,7 @@ func (R *RenderingContext) IsBuffer(buffer glone.Buffer) bool {
 }
 
 func (R *RenderingContext) IsEnabled(cap glone.Enum) bool {
-	return R.call("isEnabled", int(cap)).Bool()
+	return R.call("isEnabled", int32(cap)).Bool()
 }
 
 func (R *RenderingContext) IsFramebuffer(framebuffer glone.Framebuffer) bool {
@@ -407,12 +406,12 @@ func (R *RenderingContext) GetShaderSource(shader glone.Shader) string {
 
 func (R *RenderingContext) GetShaderParameter(shader glone.Shader, pname glone.Enum) any {
 	s := shaderOrNil(shader)
-	return castToAny(R.call("getShaderParameter", s, int(pname)))
+	return castToAny(R.call("getShaderParameter", s, int32(pname)))
 }
 
 func (R *RenderingContext) GetShaderPrecisionFormat(shadertype, precisiontype glone.Enum) glone.ShaderPrecisionFormat {
 	return ShaderPrecisionFormat{
-		R.call("getShaderPrecisionFormat", int(shadertype), int(precisiontype)),
+		R.call("getShaderPrecisionFormat", int32(shadertype), int32(precisiontype)),
 	}
 }
 
@@ -452,14 +451,14 @@ func (R *RenderingContext) UseProgram(program glone.Program) {
 	R.call("useProgram", p)
 }
 
-func (R *RenderingContext) GetActiveAttrib(program glone.Program, index uint) glone.ActiveInfo {
+func (R *RenderingContext) GetActiveAttrib(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
 	return ActiveInfo{
 		R.call("getActiveAttrib", p, index),
 	}
 }
 
-func (R *RenderingContext) GetActiveUniform(program glone.Program, index uint) glone.ActiveInfo {
+func (R *RenderingContext) GetActiveUniform(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
 	return ActiveInfo{
 		R.call("getActiveUniform", p, index),
@@ -471,9 +470,9 @@ func (R *RenderingContext) GetAttachedShaders(program glone.Program) []glone.Sha
 	return getShaderArray(R.call("getAttachedShaders", p))
 }
 
-func (R *RenderingContext) GetAttribLocation(program glone.Program, name string) int {
+func (R *RenderingContext) GetAttribLocation(program glone.Program, name string) int32 {
 	p := programOrNil(program)
-	return R.call("getAttribLocation", p, name).Int()
+	return int32(R.call("getAttribLocation", p, name).Int())
 }
 
 func (R *RenderingContext) GetProgramInfoLog(program glone.Program) string {
@@ -498,72 +497,72 @@ func (R *RenderingContext) GetUniformLocation(program glone.Program, name string
 	}
 }
 
-func (R *RenderingContext) GetFragDataLocation(program glone.Program, name string) int {
+func (R *RenderingContext) GetFragDataLocation(program glone.Program, name string) int32 {
 	p := programOrNil(program)
-	return R.call("getFragDataLocation", p, name).Int()
+	return int32(R.call("getFragDataLocation", p, name).Int())
 }
 
 func (R *RenderingContext) GetProgramParameter(program glone.Program, pname glone.Enum) any {
 	p := programOrNil(program)
-	return castToAny(R.call("getProgramParameter", p, int(pname)))
+	return castToAny(R.call("getProgramParameter", p, int32(pname)))
 }
 
-func (R *RenderingContext) Uniform1f(location glone.UniformLocation, x float64) {
+func (R *RenderingContext) Uniform1f(location glone.UniformLocation, x float32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform1f", l, x)
 }
 
-func (R *RenderingContext) Uniform2f(location glone.UniformLocation, x, y float64) {
+func (R *RenderingContext) Uniform2f(location glone.UniformLocation, x, y float32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform2f", l, x, y)
 }
 
-func (R *RenderingContext) Uniform3f(location glone.UniformLocation, x, y, z float64) {
+func (R *RenderingContext) Uniform3f(location glone.UniformLocation, x, y, z float32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform3f", l, x, y, z)
 }
 
-func (R *RenderingContext) Uniform4f(location glone.UniformLocation, x, y, z, w float64) {
+func (R *RenderingContext) Uniform4f(location glone.UniformLocation, x, y, z, w float32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform4f", l, x, y, z, w)
 }
 
-func (R *RenderingContext) Uniform1i(location glone.UniformLocation, x int) {
+func (R *RenderingContext) Uniform1i(location glone.UniformLocation, x int32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform1i", l, x)
 }
 
-func (R *RenderingContext) Uniform2i(location glone.UniformLocation, x, y int) {
+func (R *RenderingContext) Uniform2i(location glone.UniformLocation, x, y int32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform2i", l, x, y)
 }
 
-func (R *RenderingContext) Uniform3i(location glone.UniformLocation, x, y, z int) {
+func (R *RenderingContext) Uniform3i(location glone.UniformLocation, x, y, z int32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform3i", l, x, y, z)
 }
 
-func (R *RenderingContext) Uniform4i(location glone.UniformLocation, x, y, z, w int) {
+func (R *RenderingContext) Uniform4i(location glone.UniformLocation, x, y, z, w int32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform4i", l, x, y, z, w)
 }
 
-func (R *RenderingContext) Uniform1ui(location glone.UniformLocation, v0 uint) {
+func (R *RenderingContext) Uniform1ui(location glone.UniformLocation, v0 uint32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform1ui", l, v0)
 }
 
-func (R *RenderingContext) Uniform2ui(location glone.UniformLocation, v0, v1 uint) {
+func (R *RenderingContext) Uniform2ui(location glone.UniformLocation, v0, v1 uint32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform2ui", l, v0, v1)
 }
 
-func (R *RenderingContext) Uniform3ui(location glone.UniformLocation, v0, v1, v2 uint) {
+func (R *RenderingContext) Uniform3ui(location glone.UniformLocation, v0, v1, v2 uint32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform3ui", l, v0, v1, v2)
 }
 
-func (R *RenderingContext) Uniform4ui(location glone.UniformLocation, v0, v1, v2, v3 uint) {
+func (R *RenderingContext) Uniform4ui(location glone.UniformLocation, v0, v1, v2, v3 uint32) {
 	l := uniformLocationOrNil(location)
 	R.call("uniform4ui", l, v0, v1, v2, v3)
 }
@@ -673,144 +672,144 @@ func (R *RenderingContext) UniformMatrix3x4fv(location glone.UniformLocation, tr
 	R.call("uniformMatrix2x4fv", l, transpose, makeFloat32Array(data))
 }
 
-func (R *RenderingContext) EnableVertexAttribArray(index uint) {
+func (R *RenderingContext) EnableVertexAttribArray(index uint32) {
 	R.call("enableVertexAttribArray", index)
 }
 
-func (R *RenderingContext) DisableVertexAttribArray(index uint) {
+func (R *RenderingContext) DisableVertexAttribArray(index uint32) {
 	R.call("disableVertexAttribArray", index)
 }
 
-func (R *RenderingContext) VertexAttrib1f(index uint, x float64) {
+func (R *RenderingContext) VertexAttrib1f(index uint32, x float32) {
 	R.call("vertexAttrib1f", index, x)
 }
 
-func (R *RenderingContext) VertexAttrib2f(index uint, x, y float64) {
+func (R *RenderingContext) VertexAttrib2f(index uint32, x, y float32) {
 	R.call("vertexAttrib2f", index, x, y)
 }
 
-func (R *RenderingContext) VertexAttrib3f(index uint, x, y, z float64) {
+func (R *RenderingContext) VertexAttrib3f(index uint32, x, y, z float32) {
 	R.call("vertexAttrib3f", index, x, y, z)
 }
 
-func (R *RenderingContext) VertexAttrib4f(index uint, x, y, z, w float64) {
+func (R *RenderingContext) VertexAttrib4f(index uint32, x, y, z, w float32) {
 	R.call("vertexAttrib4f", index, x, y, z, w)
 }
 
-func (R *RenderingContext) VertexAttrib1fv(index uint, values []float32) {
+func (R *RenderingContext) VertexAttrib1fv(index uint32, values []float32) {
 	R.call("vertexAttrib1fv", index, makeFloat32Array(values))
 }
 
-func (R *RenderingContext) VertexAttrib2fv(index uint, values []float32) {
+func (R *RenderingContext) VertexAttrib2fv(index uint32, values []float32) {
 	R.call("vertexAttrib2fv", index, makeFloat32Array(values))
 }
 
-func (R *RenderingContext) VertexAttrib3fv(index uint, values []float32) {
+func (R *RenderingContext) VertexAttrib3fv(index uint32, values []float32) {
 	R.call("vertexAttrib3fv", index, makeFloat32Array(values))
 }
 
-func (R *RenderingContext) VertexAttrib4fv(index uint, values []float32) {
+func (R *RenderingContext) VertexAttrib4fv(index uint32, values []float32) {
 	R.call("vertexAttrib4fv", index, makeFloat32Array(values))
 }
 
-func (R *RenderingContext) VertexAttribI4i(index uint, x, y, z, w int) {
+func (R *RenderingContext) VertexAttribI4i(index uint32, x, y, z, w int32) {
 	R.call("vertexAttribI4i", index, x, y, z, w)
 }
 
-func (R *RenderingContext) VertexAttribI4ui(index, x, y, z, w uint) {
+func (R *RenderingContext) VertexAttribI4ui(index, x, y, z, w uint32) {
 	R.call("vertexAttribI4ui", index, x, y, z, w)
 }
 
-func (R *RenderingContext) VertexAttribI4iv(index uint, values []int32) {
+func (R *RenderingContext) VertexAttribI4iv(index uint32, values []int32) {
 	R.call("vertexAttribI4iv", index, makeInt32Array(values))
 }
 
-func (R *RenderingContext) VertexAttribI4uiv(index uint, values []uint32) {
+func (R *RenderingContext) VertexAttribI4uiv(index uint32, values []uint32) {
 	R.call("vertexAttribI4uiv", index, makeUint32Array(values))
 }
 
-func (R *RenderingContext) VertexAttribPointer(index uint, size int, typ glone.Enum, normalized bool, stride, offset int) {
-	R.call("vertexAttribPointer", index, size, int(typ), normalized, stride, offset)
+func (R *RenderingContext) VertexAttribPointer(index uint32, size int32, typ glone.Enum, normalized bool, stride, offset int32) {
+	R.call("vertexAttribPointer", index, size, int32(typ), normalized, stride, offset)
 }
 
-func (R *RenderingContext) VertexAttribIPointer(index uint, size int, typ glone.Enum, stride, offset int) {
-	R.call("vertexAttribIPointer", index, size, int(typ), stride, offset)
+func (R *RenderingContext) VertexAttribIPointer(index uint32, size int32, typ glone.Enum, stride, offset int32) {
+	R.call("vertexAttribIPointer", index, size, int32(typ), stride, offset)
 }
 
-func (R *RenderingContext) VertexAttribDivisor(index, divisor uint) {
+func (R *RenderingContext) VertexAttribDivisor(index, divisor uint32) {
 	R.call("vertexAttribDivisor", index, divisor)
 }
 
-func (R *RenderingContext) GetVertexAttrib(index uint, pname glone.Enum) any {
-	return castToAny(R.call("getVertexAttrib", index, int(pname)))
+func (R *RenderingContext) GetVertexAttrib(index uint32, pname glone.Enum) any {
+	return castToAny(R.call("getVertexAttrib", index, int32(pname)))
 }
 
-func (R *RenderingContext) GetVertexAttribOffset(index uint, pname glone.Enum) int {
-	return R.call("getVertexAttribOffset", index, int(pname)).Int()
+func (R *RenderingContext) GetVertexAttribOffset(index uint32, pname glone.Enum) int32 {
+	return int32(R.call("getVertexAttribOffset", index, int32(pname)).Int())
 }
 
 func (R *RenderingContext) FramebufferRenderbuffer(target, attachment, renderbuffertarget glone.Enum, renderbuffer glone.Renderbuffer) {
 	r := renderbufferOrNil(renderbuffer)
-	R.call("framebufferRenderbuffer", int(target), int(attachment), int(renderbuffertarget), r)
+	R.call("framebufferRenderbuffer", int32(target), int32(attachment), int32(renderbuffertarget), r)
 }
 
-func (R *RenderingContext) FramebufferTexture2D(target, attachment, textarget glone.Enum, texture glone.Texture, level int) {
+func (R *RenderingContext) FramebufferTexture2D(target, attachment, textarget glone.Enum, texture glone.Texture, level int32) {
 	t := textureOrNil(texture)
-	R.call("framebufferTexture2D", int(target), int(attachment), int(textarget), t, level)
+	R.call("framebufferTexture2D", int32(target), int32(attachment), int32(textarget), t, level)
 }
 
 func (R *RenderingContext) CheckFramebufferStatus(target glone.Enum) glone.Enum {
-	return glone.Enum(R.call("checkFramebufferStatus", int(target)).Int())
+	return glone.Enum(R.call("checkFramebufferStatus", int32(target)).Int())
 }
 
 func (R *RenderingContext) GetFramebufferAttachmentParameter(target, attachment, pname glone.Enum) any {
-	return castToAny(R.call("getFramebufferAttachmentParameter", int(target), int(attachment), int(pname)))
+	return castToAny(R.call("getFramebufferAttachmentParameter", int32(target), int32(attachment), int32(pname)))
 }
 
-func (R *RenderingContext) BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1 int, mask, filter glone.Enum) {
-	R.call("blitFramebuffer", srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, int(mask), int(filter))
+func (R *RenderingContext) BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1 int32, mask, filter glone.Enum) {
+	R.call("blitFramebuffer", srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, int32(mask), int32(filter))
 }
 
-func (R *RenderingContext) FramebufferTextureLayer(target, attachment glone.Enum, texture glone.Texture, level, layer int) {
+func (R *RenderingContext) FramebufferTextureLayer(target, attachment glone.Enum, texture glone.Texture, level, layer int32) {
 	t := textureOrNil(texture)
-	R.call("framebufferTextureLayer", int(target), int(attachment), t, level, layer)
+	R.call("framebufferTextureLayer", int32(target), int32(attachment), t, level, layer)
 }
 
 func (R *RenderingContext) InvalidateFramebuffer(target glone.Enum, attachments []glone.Enum) {
-	R.call("invalidateFramebuffer", int(target), makeEnumArray(attachments))
+	R.call("invalidateFramebuffer", int32(target), makeEnumArray(attachments))
 }
 
-func (R *RenderingContext) InvalidateSubFramebuffer(target glone.Enum, attachments []glone.Enum, x, y, width, height int) {
-	R.call("invalidateSubFramebuffer", int(target), makeEnumArray(attachments), x, y, width, height)
+func (R *RenderingContext) InvalidateSubFramebuffer(target glone.Enum, attachments []glone.Enum, x, y, width, height int32) {
+	R.call("invalidateSubFramebuffer", int32(target), makeEnumArray(attachments), x, y, width, height)
 }
 
 func (R *RenderingContext) ReadBuffer(src glone.Enum) {
-	R.call("readBuffer", int(src))
+	R.call("readBuffer", int32(src))
 }
 
-func (R *RenderingContext) RenderbufferStorage(target, internalformat glone.Enum, width, height int) {
-	R.call("renderbufferStorage", int(target), int(internalformat), width, height)
+func (R *RenderingContext) RenderbufferStorage(target, internalformat glone.Enum, width, height int32) {
+	R.call("renderbufferStorage", int32(target), int32(internalformat), width, height)
 }
 
-func (R *RenderingContext) RenderbufferStorageMultisample(target glone.Enum, samples int, internalformat glone.Enum, width, height int) {
-	R.call("renderbufferStorageMultisample", int(target), samples, int(internalformat), width, height)
+func (R *RenderingContext) RenderbufferStorageMultisample(target glone.Enum, samples int32, internalformat glone.Enum, width, height int32) {
+	R.call("renderbufferStorageMultisample", int32(target), samples, int32(internalformat), width, height)
 }
 
 func (R *RenderingContext) GetRenderbufferParameter(target, pname glone.Enum) any {
-	return castToAny(R.call("getRenderbufferParameter", int(target), int(pname)))
+	return castToAny(R.call("getRenderbufferParameter", int32(target), int32(pname)))
 }
 
 func (R *RenderingContext) GetInternalFormatParameter(target, internalformat, pname glone.Enum) any {
-	return castToAny(R.call("getInternalFormatParameter", int(target), int(internalformat), int(pname)))
+	return castToAny(R.call("getInternalFormatParameter", int32(target), int32(internalformat), int32(pname)))
 }
 
-func (R *RenderingContext) ReadPixelsOff(x, y, width, height int, format, typ glone.Enum, offset int) {
-	R.call("readPixels", x, y, width, height, int(format), int(typ), offset)
+func (R *RenderingContext) ReadPixelsOff(x, y, width, height int32, format, typ glone.Enum, offset int32) {
+	R.call("readPixels", x, y, width, height, int32(format), int32(typ), offset)
 }
 
-func (R *RenderingContext) ReadPixelsPix(x, y, width, height int, format, typ glone.Enum, dstData []byte) {
+func (R *RenderingContext) ReadPixelsPix(x, y, width, height int32, format, typ glone.Enum, dstData []byte) {
 	dst := makeByteArrayLength(len(dstData))
-	R.call("readPixels", x, y, width, height, int(format), int(typ), dst)
+	R.call("readPixels", x, y, width, height, int32(format), int32(typ), dst)
 	js.CopyBytesToGo(dstData, dst)
 }
 
@@ -818,240 +817,240 @@ func (R *RenderingContext) DrawBuffers(buffers []glone.Enum) {
 	R.call("drawBuffers", makeEnumArray(buffers))
 }
 
-func (R *RenderingContext) ClearBufferfv(buffer glone.Enum, drawbuffer int, values []float32) {
-	R.call("clearBufferfv", int(buffer), drawbuffer, makeFloat32Array(values))
+func (R *RenderingContext) ClearBufferfv(buffer glone.Enum, drawbuffer int32, values []float32) {
+	R.call("clearBufferfv", int32(buffer), drawbuffer, makeFloat32Array(values))
 }
 
-func (R *RenderingContext) ClearBufferiv(buffer glone.Enum, drawbuffer int, values []int32) {
-	R.call("clearBufferiv", int(buffer), drawbuffer, makeInt32Array(values))
+func (R *RenderingContext) ClearBufferiv(buffer glone.Enum, drawbuffer int32, values []int32) {
+	R.call("clearBufferiv", int32(buffer), drawbuffer, makeInt32Array(values))
 }
 
-func (R *RenderingContext) ClearBufferuiv(buffer glone.Enum, drawbuffer int, values []uint32) {
-	R.call("clearBufferuiv", int(buffer), drawbuffer, makeUint32Array(values))
+func (R *RenderingContext) ClearBufferuiv(buffer glone.Enum, drawbuffer int32, values []uint32) {
+	R.call("clearBufferuiv", int32(buffer), drawbuffer, makeUint32Array(values))
 }
 
-func (R *RenderingContext) ClearBufferfi(buffer glone.Enum, drawbuffer int, depth float64, stencil int) {
-	R.call("clearBufferfi", int(buffer), drawbuffer, depth, stencil)
+func (R *RenderingContext) ClearBufferfi(buffer glone.Enum, drawbuffer int32, depth float32, stencil int32) {
+	R.call("clearBufferfi", int32(buffer), drawbuffer, depth, stencil)
 }
 
-func (R *RenderingContext) BufferDataSize(target glone.Enum, size int, usage glone.Enum) {
-	R.call("bufferData", int(target), size, int(usage))
+func (R *RenderingContext) BufferDataSize(target glone.Enum, size int32, usage glone.Enum) {
+	R.call("bufferData", int32(target), size, int32(usage))
 }
 
 func (R *RenderingContext) BufferDataSrc(target glone.Enum, data glone.BufferSource, usage glone.Enum) {
 	d := bufferSourceOrNil(data)
-	R.call("bufferData", int(target), d, int(usage))
+	R.call("bufferData", int32(target), d, int32(usage))
 }
 
 func (R *RenderingContext) BufferDataPix(target glone.Enum, srcData []byte, usage glone.Enum) {
-	R.call("bufferData", int(target), makeByteArray(srcData), int(usage))
+	R.call("bufferData", int32(target), makeByteArray(srcData), int32(usage))
 }
 
-func (R *RenderingContext) BufferSubDataSrc(target glone.Enum, offset int, data glone.BufferSource) {
+func (R *RenderingContext) BufferSubDataSrc(target glone.Enum, offset int32, data glone.BufferSource) {
 	d := bufferSourceOrNil(data)
-	R.call("bufferSubData", int(target), offset, d)
+	R.call("bufferSubData", int32(target), offset, d)
 }
 
-func (R *RenderingContext) BufferSubDataPix(target glone.Enum, dstByteOffset int, srcData []byte) {
-	R.call("bufferSubData", int(target), dstByteOffset, makeByteArray(srcData))
+func (R *RenderingContext) BufferSubDataPix(target glone.Enum, dstByteOffset int32, srcData []byte) {
+	R.call("bufferSubData", int32(target), dstByteOffset, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) GetBufferParameter(target, pname glone.Enum) any {
-	return castToAny(R.call("getBufferParameter", int(target), int(pname)))
+	return castToAny(R.call("getBufferParameter", int32(target), int32(pname)))
 }
 
-func (R *RenderingContext) CopyBufferSubData(readTarget, writeTarget glone.Enum, readOffset, writeOffset, size int) {
-	R.call("copyBufferSubData", int(readTarget), int(writeTarget), readOffset, writeOffset, size)
+func (R *RenderingContext) CopyBufferSubData(readTarget, writeTarget glone.Enum, readOffset, writeOffset, size int32) {
+	R.call("copyBufferSubData", int32(readTarget), int32(writeTarget), readOffset, writeOffset, size)
 }
 
-func (R *RenderingContext) GetBufferSubData(target glone.Enum, srcByteOffset int, dstBuffer []byte) {
+func (R *RenderingContext) GetBufferSubData(target glone.Enum, srcByteOffset int32, dstBuffer []byte) {
 	dst := makeByteArrayLength(len(dstBuffer))
-	R.call("getBufferSubData", int(target), srcByteOffset, dst)
+	R.call("getBufferSubData", int32(target), srcByteOffset, dst)
 	js.CopyBytesToGo(dstBuffer, dst)
 }
 
 func (R *RenderingContext) ActiveTexture(texture glone.Enum) {
-	R.call("activeTexture", int(texture))
+	R.call("activeTexture", int32(texture))
 }
 
-func (R *RenderingContext) TexParameterf(target, pname glone.Enum, param float64) {
-	R.call("texParameterf", int(target), int(pname), param)
+func (R *RenderingContext) TexParameterf(target, pname glone.Enum, param float32) {
+	R.call("texParameterf", int32(target), int32(pname), param)
 }
 
-func (R *RenderingContext) TexParameteri(target, pname glone.Enum, param int) {
-	R.call("texParameteri", int(target), int(pname), param)
+func (R *RenderingContext) TexParameteri(target, pname glone.Enum, param int32) {
+	R.call("texParameteri", int32(target), int32(pname), param)
 }
 
 func (R *RenderingContext) GetTexParameter(target, pname glone.Enum) any {
-	return castToAny(R.call("getTexParameter", int(target), int(pname)))
+	return castToAny(R.call("getTexParameter", int32(target), int32(pname)))
 }
 
 func (R *RenderingContext) GenerateMipmap(target glone.Enum) {
-	R.call("generateMipmap", int(target))
+	R.call("generateMipmap", int32(target))
 }
 
-func (R *RenderingContext) CopyTexImage2D(target glone.Enum, level int, internalformat glone.Enum, x, y, width, height, border int) {
-	R.call("copyTexImage2D", int(target), level, int(internalformat), x, y, width, height, border)
+func (R *RenderingContext) CopyTexImage2D(target glone.Enum, level int32, internalformat glone.Enum, x, y, width, height, border int32) {
+	R.call("copyTexImage2D", int32(target), level, int32(internalformat), x, y, width, height, border)
 }
 
-func (R *RenderingContext) CopyTexSubImage2D(target glone.Enum, level int, xoffset, yoffset, x, y, width, height int) {
-	R.call("copyTexSubImage2D", int(target), level, xoffset, yoffset, x, y, width, height)
+func (R *RenderingContext) CopyTexSubImage2D(target glone.Enum, level int32, xoffset, yoffset, x, y, width, height int32) {
+	R.call("copyTexSubImage2D", int32(target), level, xoffset, yoffset, x, y, width, height)
 }
 
-func (R *RenderingContext) TexStorage2D(target glone.Enum, levels int, internalformat glone.Enum, width, height int) {
-	R.call("texStorage2D", int(target), levels, int(internalformat), width, height)
+func (R *RenderingContext) TexStorage2D(target glone.Enum, levels int32, internalformat glone.Enum, width, height int32) {
+	R.call("texStorage2D", int32(target), levels, int32(internalformat), width, height)
 }
 
-func (R *RenderingContext) TexStorage3D(target glone.Enum, levels int, internalformat glone.Enum, width, height, depth int) {
-	R.call("texStorage3D", int(target), levels, int(internalformat), width, height, depth)
+func (R *RenderingContext) TexStorage3D(target glone.Enum, levels int32, internalformat glone.Enum, width, height, depth int32) {
+	R.call("texStorage3D", int32(target), levels, int32(internalformat), width, height, depth)
 }
 
-func (R *RenderingContext) TexImage2DPbo(target glone.Enum, level, internalformat, width, height, border int, format, typ glone.Enum, pboOffset int) {
-	R.call("texImage2D", int(target), level, internalformat, width, height, border, int(format), int(typ), pboOffset)
+func (R *RenderingContext) TexImage2DPbo(target glone.Enum, level, internalformat, width, height, border int32, format, typ glone.Enum, pboOffset int32) {
+	R.call("texImage2D", int32(target), level, internalformat, width, height, border, int32(format), int32(typ), pboOffset)
 }
 
-func (R *RenderingContext) TexImage2DSrc(target glone.Enum, level, internalformat, width, height, border int, format, typ glone.Enum, source glone.TexImageSource) {
+func (R *RenderingContext) TexImage2DSrc(target glone.Enum, level, internalformat, width, height, border int32, format, typ glone.Enum, source glone.TexImageSource) {
 	s := texImageSourceOrNil(source)
-	R.call("texImage2D", int(target), level, internalformat, width, height, border, int(format), int(typ), s)
+	R.call("texImage2D", int32(target), level, internalformat, width, height, border, int32(format), int32(typ), s)
 }
 
-func (R *RenderingContext) TexImage2DPix(target glone.Enum, level, internalformat, width, height, border int, format, typ glone.Enum, srcData []byte) {
-	R.call("texImage2D", int(target), level, internalformat, width, height, border, int(format), int(typ), makeByteArray(srcData))
+func (R *RenderingContext) TexImage2DPix(target glone.Enum, level, internalformat, width, height, border int32, format, typ glone.Enum, srcData []byte) {
+	R.call("texImage2D", int32(target), level, internalformat, width, height, border, int32(format), int32(typ), makeByteArray(srcData))
 }
 
-func (R *RenderingContext) TexSubImage2DPbo(target glone.Enum, level, xoffset, yoffset, width, height int, format, typ glone.Enum, pboOffset int) {
-	R.call("texSubImage2D", int(target), level, xoffset, yoffset, width, height, int(format), int(typ), pboOffset)
+func (R *RenderingContext) TexSubImage2DPbo(target glone.Enum, level, xoffset, yoffset, width, height int32, format, typ glone.Enum, pboOffset int32) {
+	R.call("texSubImage2D", int32(target), level, xoffset, yoffset, width, height, int32(format), int32(typ), pboOffset)
 }
 
-func (R *RenderingContext) TexSubImage2DSrc(target glone.Enum, level, xoffset, yoffset, width, height int, format, typ glone.Enum, source glone.TexImageSource) {
+func (R *RenderingContext) TexSubImage2DSrc(target glone.Enum, level, xoffset, yoffset, width, height int32, format, typ glone.Enum, source glone.TexImageSource) {
 	s := texImageSourceOrNil(source)
-	R.call("texSubImage2D", int(target), level, xoffset, yoffset, width, height, int(format), int(typ), s)
+	R.call("texSubImage2D", int32(target), level, xoffset, yoffset, width, height, int32(format), int32(typ), s)
 }
 
-func (R *RenderingContext) TexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int, format, typ glone.Enum, srcData []byte) {
-	R.call("texSubImage2D", int(target), level, xoffset, yoffset, width, height, int(format), int(typ), makeByteArray(srcData))
+func (R *RenderingContext) TexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int32, format, typ glone.Enum, srcData []byte) {
+	R.call("texSubImage2D", int32(target), level, xoffset, yoffset, width, height, int32(format), int32(typ), makeByteArray(srcData))
 }
 
-func (R *RenderingContext) TexImage3DPbo(target glone.Enum, level, internalformat, width, height, depth, border int, format, typ glone.Enum, pboOffset int) {
-	R.call("texImage3D", int(target), level, internalformat, width, height, depth, border, int(format), int(typ), pboOffset)
+func (R *RenderingContext) TexImage3DPbo(target glone.Enum, level, internalformat, width, height, depth, border int32, format, typ glone.Enum, pboOffset int32) {
+	R.call("texImage3D", int32(target), level, internalformat, width, height, depth, border, int32(format), int32(typ), pboOffset)
 }
 
-func (R *RenderingContext) TexImage3DSrc(target glone.Enum, level, internalformat, width, height, depth, border int, format, typ glone.Enum, source glone.TexImageSource) {
+func (R *RenderingContext) TexImage3DSrc(target glone.Enum, level, internalformat, width, height, depth, border int32, format, typ glone.Enum, source glone.TexImageSource) {
 	s := texImageSourceOrNil(source)
-	R.call("texImage3D", int(target), level, internalformat, width, height, depth, border, int(format), int(typ), s)
+	R.call("texImage3D", int32(target), level, internalformat, width, height, depth, border, int32(format), int32(typ), s)
 }
 
-func (R *RenderingContext) TexImage3DPix(target glone.Enum, level, internalformat, width, height, depth, border int, format, typ glone.Enum, srcData []byte) {
-	R.call("texImage3D", int(target), level, internalformat, width, height, depth, border, int(format), int(typ), makeByteArray(srcData))
+func (R *RenderingContext) TexImage3DPix(target glone.Enum, level, internalformat, width, height, depth, border int32, format, typ glone.Enum, srcData []byte) {
+	R.call("texImage3D", int32(target), level, internalformat, width, height, depth, border, int32(format), int32(typ), makeByteArray(srcData))
 }
 
-func (R *RenderingContext) TexSubImage3DPbo(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format, typ glone.Enum, pboOffset int) {
-	R.call("texSubImage3D", int(target), level, xoffset, yoffset, zoffset, width, height, depth, int(format), int(typ), pboOffset)
+func (R *RenderingContext) TexSubImage3DPbo(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ glone.Enum, pboOffset int32) {
+	R.call("texSubImage3D", int32(target), level, xoffset, yoffset, zoffset, width, height, depth, int32(format), int32(typ), pboOffset)
 }
 
-func (R *RenderingContext) TexSubImage3DSrc(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format, typ glone.Enum, source glone.TexImageSource) {
+func (R *RenderingContext) TexSubImage3DSrc(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ glone.Enum, source glone.TexImageSource) {
 	s := texImageSourceOrNil(source)
-	R.call("texSubImage3D", int(target), level, xoffset, yoffset, zoffset, width, height, depth, int(format), int(typ), s)
+	R.call("texSubImage3D", int32(target), level, xoffset, yoffset, zoffset, width, height, depth, int32(format), int32(typ), s)
 }
 
-func (R *RenderingContext) TexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format, typ glone.Enum, srcData []byte) {
-	R.call("texSubImage3D", int(target), level, xoffset, yoffset, zoffset, width, height, depth, int(format), int(typ), makeByteArray(srcData))
+func (R *RenderingContext) TexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ glone.Enum, srcData []byte) {
+	R.call("texSubImage3D", int32(target), level, xoffset, yoffset, zoffset, width, height, depth, int32(format), int32(typ), makeByteArray(srcData))
 }
 
-func (R *RenderingContext) CopyTexSubImage3D(target glone.Enum, level, xoffset, yoffset, zoffset, x, y, width, height int) {
-	R.call("copyTexSubImage3D", int(target), level, xoffset, yoffset, zoffset, x, y, width, height)
+func (R *RenderingContext) CopyTexSubImage3D(target glone.Enum, level, xoffset, yoffset, zoffset, x, y, width, height int32) {
+	R.call("copyTexSubImage3D", int32(target), level, xoffset, yoffset, zoffset, x, y, width, height)
 }
 
-func (R *RenderingContext) CompressedTexImage2DOff(target glone.Enum, level int, internalformat glone.Enum, width, height, border, imageSize, offset int) {
-	R.call("compressedTexImage2D", int(target), level, int(internalformat), width, height, border, imageSize, offset)
+func (R *RenderingContext) CompressedTexImage2DSize(target glone.Enum, level int32, internalformat glone.Enum, width, height, border, imageSize, offset int32) {
+	R.call("compressedTexImage2D", int32(target), level, int32(internalformat), width, height, border, imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexImage2DPix(target glone.Enum, level int, internalformat glone.Enum, width, height, border int, srcData []byte) {
-	R.call("compressedTexImage2D", int(target), level, int(internalformat), width, height, border, makeByteArray(srcData))
+func (R *RenderingContext) CompressedTexImage2DPix(target glone.Enum, level int32, internalformat glone.Enum, width, height, border int32, srcData []byte) {
+	R.call("compressedTexImage2D", int32(target), level, int32(internalformat), width, height, border, makeByteArray(srcData))
 }
 
-func (R *RenderingContext) CompressedTexSubImage2DOff(target glone.Enum, level, xoffset, yoffset, width, height int, format glone.Enum, imageSize, offset int) {
-	R.call("compressedTexSubImage2D", int(target), level, xoffset, yoffset, width, height, int(format), imageSize, offset)
+func (R *RenderingContext) CompressedTexSubImage2DSize(target glone.Enum, level, xoffset, yoffset, width, height int32, format glone.Enum, imageSize, offset int32) {
+	R.call("compressedTexSubImage2D", int32(target), level, xoffset, yoffset, width, height, int32(format), imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int, format glone.Enum, srcData []byte) {
-	R.call("compressedTexSubImage2D", int(target), level, xoffset, yoffset, width, height, int(format), makeByteArray(srcData))
+func (R *RenderingContext) CompressedTexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int32, format glone.Enum, srcData []byte) {
+	R.call("compressedTexSubImage2D", int32(target), level, xoffset, yoffset, width, height, int32(format), makeByteArray(srcData))
 }
 
-func (R *RenderingContext) CompressedTexImage3D(target glone.Enum, level int, internalformat glone.Enum, width, height, depth, border, imageSize, offset int) {
-	R.call("compressedTexImage3D", int(target), level, int(internalformat), width, height, depth, border, imageSize, offset)
+func (R *RenderingContext) CompressedTexImage3DSize(target glone.Enum, level int32, internalformat glone.Enum, width, height, depth, border, imageSize, offset int32) {
+	R.call("compressedTexImage3D", int32(target), level, int32(internalformat), width, height, depth, border, imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexImage3DPix(target glone.Enum, level int, internalformat glone.Enum, width, height, depth, border int, srcData []byte) {
-	R.call("compressedTexImage3D", int(target), level, int(internalformat), width, height, depth, border, makeByteArray(srcData))
+func (R *RenderingContext) CompressedTexImage3DPix(target glone.Enum, level int32, internalformat glone.Enum, width, height, depth, border int32, srcData []byte) {
+	R.call("compressedTexImage3D", int32(target), level, int32(internalformat), width, height, depth, border, makeByteArray(srcData))
 }
 
-func (R *RenderingContext) CompressedTexSubImage3D(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format glone.Enum, imageSize, offset int) {
-	R.call("compressedTexSubImage3D", int(target), level, xoffset, yoffset, zoffset, width, height, depth, int(format), imageSize, offset)
+func (R *RenderingContext) CompressedTexSubImage3DSize(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format glone.Enum, imageSize, offset int32) {
+	R.call("compressedTexSubImage3D", int32(target), level, xoffset, yoffset, zoffset, width, height, depth, int32(format), imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format glone.Enum, srcData []byte) {
-	R.call("compressedTexSubImage3D", int(target), level, xoffset, yoffset, zoffset, width, height, depth, int(format), makeByteArray(srcData))
+func (R *RenderingContext) CompressedTexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format glone.Enum, srcData []byte) {
+	R.call("compressedTexSubImage3D", int32(target), level, xoffset, yoffset, zoffset, width, height, depth, int32(format), makeByteArray(srcData))
 }
 
 func (R *RenderingContext) BeginQuery(target glone.Enum, query glone.Query) {
 	q := queryOrNil(query)
-	R.call("beginQuery", int(target), q)
+	R.call("beginQuery", int32(target), q)
 }
 
 func (R *RenderingContext) EndQuery(target glone.Enum) {
-	R.call("endQuery", int(target))
+	R.call("endQuery", int32(target))
 }
 
 func (R *RenderingContext) GetQuery(target, pname glone.Enum) glone.Query {
 	return Query{
-		R.call("getQuery", int(target), int(pname)),
+		R.call("getQuery", int32(target), int32(pname)),
 	}
 }
 
 func (R *RenderingContext) GetQueryParameter(query glone.Query, pname glone.Enum) any {
 	q := queryOrNil(query)
-	return castToAny(R.call("getQueryParameter", q, int(pname)))
+	return castToAny(R.call("getQueryParameter", q, int32(pname)))
 }
 
-func (R *RenderingContext) SamplerParameteri(sampler glone.Sampler, pname glone.Enum, param int) {
+func (R *RenderingContext) SamplerParameteri(sampler glone.Sampler, pname glone.Enum, param int32) {
 	s := samplerOrNil(sampler)
-	R.call("samplerParameteri", s, int(pname), param)
+	R.call("samplerParameteri", s, int32(pname), param)
 }
 
-func (R *RenderingContext) SamplerParameterf(sampler glone.Sampler, pname glone.Enum, param float64) {
+func (R *RenderingContext) SamplerParameterf(sampler glone.Sampler, pname glone.Enum, param float32) {
 	s := samplerOrNil(sampler)
-	R.call("samplerParameterf", s, int(pname), param)
+	R.call("samplerParameterf", s, int32(pname), param)
 }
 
 func (R *RenderingContext) GetSamplerParameter(sampler glone.Sampler, pname glone.Enum) any {
 	s := samplerOrNil(sampler)
-	return castToAny(R.call("getSamplerParameter", s, int(pname)))
+	return castToAny(R.call("getSamplerParameter", s, int32(pname)))
 }
 
 func (R *RenderingContext) FenceSync(condition, flags glone.Enum) glone.Sync {
 	return Sync{
-		R.call("fenceSync", int(condition), int(flags)),
+		R.call("fenceSync", int32(condition), int32(flags)),
 	}
 }
 
-func (R *RenderingContext) ClientWaitSync(sync glone.Sync, flags glone.Enum, timeout uint) {
+func (R *RenderingContext) ClientWaitSync(sync glone.Sync, flags glone.Enum, timeout uint64) {
 	s := syncOrNil(sync)
-	R.call("clientWaitSync", s, int(flags), timeout)
+	R.call("clientWaitSync", s, int32(flags), timeout)
 }
 
-func (R *RenderingContext) WaitSync(sync glone.Sync, flags glone.Enum, timeout int) {
+func (R *RenderingContext) WaitSync(sync glone.Sync, flags glone.Enum, timeout int64) {
 	s := syncOrNil(sync)
-	R.call("waitSync", s, int(flags), timeout)
+	R.call("waitSync", s, int32(flags), timeout)
 }
 
 func (R *RenderingContext) GetSyncParameter(sync glone.Sync, pname glone.Enum) any {
 	s := syncOrNil(sync)
-	return castToAny(R.call("getSyncParameter", s, int(pname)))
+	return castToAny(R.call("getSyncParameter", s, int32(pname)))
 }
 
 func (R *RenderingContext) BeginTransformFeedback(primitiveMode glone.Enum) {
-	R.call("beginTransformFeedback", int(primitiveMode))
+	R.call("beginTransformFeedback", int32(primitiveMode))
 }
 
 func (R *RenderingContext) EndTransformFeedback() {
@@ -1060,10 +1059,10 @@ func (R *RenderingContext) EndTransformFeedback() {
 
 func (R *RenderingContext) TransformFeedbackVaryings(program glone.Program, varyings []string, bufferMode glone.Enum) {
 	p := programOrNil(program)
-	R.call("transformFeedbackVaryings", p, makeStringArray(varyings), int(bufferMode))
+	R.call("transformFeedbackVaryings", p, makeStringArray(varyings), int32(bufferMode))
 }
 
-func (R *RenderingContext) GetTransformFeedbackVarying(program glone.Program, index uint) glone.ActiveInfo {
+func (R *RenderingContext) GetTransformFeedbackVarying(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
 	return ActiveInfo{
 		R.call("getTransformFeedbackVarying", p, index),
@@ -1078,81 +1077,81 @@ func (R *RenderingContext) ResumeTransformFeedback() {
 	R.call("resumeTransformFeedback")
 }
 
-func (R *RenderingContext) GetIndexedParameter(target glone.Enum, index uint) any {
-	return castToAny(R.call("getIndexedParameter", int(target), index))
+func (R *RenderingContext) GetIndexedParameter(target glone.Enum, index uint32) any {
+	return castToAny(R.call("getIndexedParameter", int32(target), index))
 }
 
-func (R *RenderingContext) GetUniformIndices(program glone.Program, uniformNames []string) []uint {
+func (R *RenderingContext) GetUniformIndices(program glone.Program, uniformNames []string) []uint32 {
 	p := programOrNil(program)
 	return getUintArray(R.call("getUniformIndices", p, makeStringArray(uniformNames)))
 }
 
-func (R *RenderingContext) GetActiveUniforms(program glone.Program, uniformIndices []uint, pname glone.Enum) any {
+func (R *RenderingContext) GetActiveUniforms(program glone.Program, uniformIndices []uint32, pname glone.Enum) any {
 	p := programOrNil(program)
-	return castToAny(R.call("getActiveUniforms", p, makeUintArray(uniformIndices), int(pname)))
+	return castToAny(R.call("getActiveUniforms", p, makeUintArray(uniformIndices), int32(pname)))
 }
 
-func (R *RenderingContext) GetUniformBlockIndex(program glone.Program, uniformBlockName string) uint {
+func (R *RenderingContext) GetUniformBlockIndex(program glone.Program, uniformBlockName string) uint32 {
 	p := programOrNil(program)
-	return uint(R.call("getUniformBlockIndex", p, uniformBlockName).Int())
+	return uint32(R.call("getUniformBlockIndex", p, uniformBlockName).Int())
 }
 
-func (R *RenderingContext) GetActiveUniformBlockParameter(program glone.Program, uniformBlockIndex uint, pname glone.Enum) any {
+func (R *RenderingContext) GetActiveUniformBlockParameter(program glone.Program, uniformBlockIndex uint32, pname glone.Enum) any {
 	p := programOrNil(program)
-	return castToAny(R.call("getActiveUniformBlockParameter", p, uniformBlockIndex, int(pname)))
+	return castToAny(R.call("getActiveUniformBlockParameter", p, uniformBlockIndex, int32(pname)))
 }
 
-func (R *RenderingContext) GetActiveUniformBlockName(program glone.Program, uniformBlockIndex uint) string {
+func (R *RenderingContext) GetActiveUniformBlockName(program glone.Program, uniformBlockIndex uint32) string {
 	p := programOrNil(program)
 	return R.call("getActiveUniformBlockName", p, uniformBlockIndex).String()
 }
 
-func (R *RenderingContext) UniformBlockBinding(program glone.Program, uniformBlockIndex, uniformBlockBinding uint) {
+func (R *RenderingContext) UniformBlockBinding(program glone.Program, uniformBlockIndex, uniformBlockBinding uint32) {
 	p := programOrNil(program)
 	R.call("uniformBlockBinding", p, uniformBlockIndex, uniformBlockBinding)
 }
 
-func (R *RenderingContext) Viewport(x, y, width, height int) {
+func (R *RenderingContext) Viewport(x, y, width, height int32) {
 	R.call("viewport", x, y, width, height)
 }
 
-func (R *RenderingContext) Scissor(x, y, width, height int) {
+func (R *RenderingContext) Scissor(x, y, width, height int32) {
 	R.call("scissor", x, y, width, height)
 }
 
-func (R *RenderingContext) BlendColor(red, green, blue, alpha float64) {
+func (R *RenderingContext) BlendColor(red, green, blue, alpha float32) {
 	R.call("blendColor", red, green, blue, alpha)
 }
 
 func (R *RenderingContext) BlendEquation(mode glone.Enum) {
-	R.call("blendEquation", int(mode))
+	R.call("blendEquation", int32(mode))
 }
 
 func (R *RenderingContext) BlendEquationSeparate(modeRGB, modeAlpha glone.Enum) {
-	R.call("blendEquationSeparate", int(modeRGB), int(modeAlpha))
+	R.call("blendEquationSeparate", int32(modeRGB), int32(modeAlpha))
 }
 
 func (R *RenderingContext) BlendFunc(sfactor, dfactor glone.Enum) {
-	R.call("blendFunc", int(sfactor), int(dfactor))
+	R.call("blendFunc", int32(sfactor), int32(dfactor))
 }
 
 func (R *RenderingContext) BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha glone.Enum) {
-	R.call("blendFuncSeparate", int(srcRGB), int(dstRGB), int(srcAlpha), int(dstAlpha))
+	R.call("blendFuncSeparate", int32(srcRGB), int32(dstRGB), int32(srcAlpha), int32(dstAlpha))
 }
 
 func (R *RenderingContext) Clear(mask glone.Enum) {
-	R.call("clear", int(mask))
+	R.call("clear", int32(mask))
 }
 
-func (R *RenderingContext) ClearColor(red, green, blue, alpha float64) {
+func (R *RenderingContext) ClearColor(red, green, blue, alpha float32) {
 	R.call("clearColor", red, green, blue, alpha)
 }
 
-func (R *RenderingContext) ClearDepth(depth float64) {
+func (R *RenderingContext) ClearDepth(depth float32) {
 	R.call("clearDepth", depth)
 }
 
-func (R *RenderingContext) ClearStencil(s int) {
+func (R *RenderingContext) ClearStencil(s int32) {
 	R.call("clearStencil", s)
 }
 
@@ -1161,79 +1160,79 @@ func (R *RenderingContext) ColorMask(red, green, blue, alpha bool) {
 }
 
 func (R *RenderingContext) CullFace(mode glone.Enum) {
-	R.call("cullFace", int(mode))
+	R.call("cullFace", int32(mode))
 }
 
 func (R *RenderingContext) FrontFace(mode glone.Enum) {
-	R.call("frontFace", int(mode))
+	R.call("frontFace", int32(mode))
 }
 
 func (R *RenderingContext) DepthFunc(fun glone.Enum) {
-	R.call("depthFunc", int(fun))
+	R.call("depthFunc", int32(fun))
 }
 
 func (R *RenderingContext) DepthMask(flag bool) {
 	R.call("depthMask", flag)
 }
 
-func (R *RenderingContext) DepthRange(zNear, zFar float64) {
+func (R *RenderingContext) DepthRange(zNear, zFar float32) {
 	R.call("depthRange", zNear, zFar)
 }
 
 func (R *RenderingContext) Disable(cap glone.Enum) {
-	R.call("disable", int(cap))
+	R.call("disable", int32(cap))
 }
 
 func (R *RenderingContext) Enable(cap glone.Enum) {
-	R.call("enable", int(cap))
+	R.call("enable", int32(cap))
 }
 
 func (R *RenderingContext) Hint(target, mode glone.Enum) {
-	R.call("hint", int(target), int(mode))
+	R.call("hint", int32(target), int32(mode))
 }
 
-func (R *RenderingContext) LineWidth(width float64) {
+func (R *RenderingContext) LineWidth(width float32) {
 	R.call("lineWidth", width)
 }
 
-func (R *RenderingContext) PixelStorei(pname glone.Enum, param int) {
-	R.call("pixelStorei", int(pname), param)
+func (R *RenderingContext) PixelStorei(pname glone.Enum, param int32) {
+	R.call("pixelStorei", int32(pname), param)
 }
 
-func (R *RenderingContext) PolygonOffset(factor, units float64) {
+func (R *RenderingContext) PolygonOffset(factor, units float32) {
 	R.call("polygonOffset", factor, units)
 }
 
-func (R *RenderingContext) StencilFunc(fun glone.Enum, ref int, mask uint) {
-	R.call("stencilFunc", int(fun), ref, mask)
+func (R *RenderingContext) StencilFunc(fun glone.Enum, ref int32, mask uint32) {
+	R.call("stencilFunc", int32(fun), ref, mask)
 }
 
-func (R *RenderingContext) StencilFuncSeparate(face, fun glone.Enum, ref int, mask uint) {
-	R.call("stencilFuncSeparate", int(face), int(fun), ref, mask)
+func (R *RenderingContext) StencilFuncSeparate(face, fun glone.Enum, ref int32, mask uint32) {
+	R.call("stencilFuncSeparate", int32(face), int32(fun), ref, mask)
 }
 
-func (R *RenderingContext) StencilMask(mask uint) {
+func (R *RenderingContext) StencilMask(mask uint32) {
 	R.call("stencilMask", mask)
 }
 
-func (R *RenderingContext) StencilMaskSeparate(face glone.Enum, mask uint) {
-	R.call("stencilMaskSeparate", int(face), mask)
+func (R *RenderingContext) StencilMaskSeparate(face glone.Enum, mask uint32) {
+	R.call("stencilMaskSeparate", int32(face), mask)
 }
 
 func (R *RenderingContext) StencilOp(fail, zfail, zpass glone.Enum) {
-	R.call("stencilOp", int(fail), int(zfail), int(zpass))
+	R.call("stencilOp", int32(fail), int32(zfail), int32(zpass))
 }
 
 func (R *RenderingContext) StencilOpSeparate(face, fail, zfail, zpass glone.Enum) {
-	R.call("stencilOpSeparate", int(face), int(fail), int(zfail), int(zpass))
+	R.call("stencilOpSeparate", int32(face), int32(fail), int32(zfail), int32(zpass))
 }
 
-func (R *RenderingContext) SampleCoverage(value float64, invert bool) {
+func (R *RenderingContext) SampleCoverage(value float32, invert bool) {
 	R.call("sampleCoverage", value, invert)
 }
 
 func (R *RenderingContext) GetParameter(pname glone.Enum) any {
-	return castToAny(R.call("getParameter", int(pname)))
+	return castToAny(R.call("getParameter", int32(pname)))
 }
 
 func (R *RenderingContext) Finish() {
@@ -1244,24 +1243,24 @@ func (R *RenderingContext) Flush() {
 	R.call("flush")
 }
 
-func (R *RenderingContext) DrawArrays(mode glone.Enum, first, count int) {
-	R.call("drawArrays", int(mode), first, count)
+func (R *RenderingContext) DrawArrays(mode glone.Enum, first, count int32) {
+	R.call("drawArrays", int32(mode), first, count)
 }
 
-func (R *RenderingContext) DrawElements(mode glone.Enum, count int, typ glone.Enum, offset int) {
-	R.call("drawElements", int(mode), count, int(typ), offset)
+func (R *RenderingContext) DrawElements(mode glone.Enum, count int32, typ glone.Enum, offset int32) {
+	R.call("drawElements", int32(mode), count, int32(typ), offset)
 }
 
-func (R *RenderingContext) DrawArraysInstanced(mode glone.Enum, first, count, instanceCount int) {
-	R.call("drawArraysInstanced", int(mode), first, count, instanceCount)
+func (R *RenderingContext) DrawArraysInstanced(mode glone.Enum, first, count, instanceCount int32) {
+	R.call("drawArraysInstanced", int32(mode), first, count, instanceCount)
 }
 
-func (R *RenderingContext) DrawElementsInstanced(mode glone.Enum, count int, typ glone.Enum, offset, instanceCount int) {
-	R.call("drawElementsInstanced", int(mode), count, int(typ), offset, instanceCount)
+func (R *RenderingContext) DrawElementsInstanced(mode glone.Enum, count int32, typ glone.Enum, offset, instanceCount int32) {
+	R.call("drawElementsInstanced", int32(mode), count, int32(typ), offset, instanceCount)
 }
 
-func (R *RenderingContext) DrawRangeElements(mode glone.Enum, start, end uint, count int, typ glone.Enum, offset int) {
-	R.call("drawRangeElements", int(mode), start, end, count, int(typ), offset)
+func (R *RenderingContext) DrawRangeElements(mode glone.Enum, start, end uint32, count int32, typ glone.Enum, offset int32) {
+	R.call("drawRangeElements", int32(mode), start, end, count, int32(typ), offset)
 }
 
 func (R *RenderingContext) GetError() glone.Enum {

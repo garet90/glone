@@ -9,6 +9,8 @@ type ShaderPrecisionFormat struct {
 	value js.Value
 }
 
+func (ShaderPrecisionFormat) GLOneShaderPrecisionFormat() {}
+
 func shaderPrecisionFormatOrNil(v glone.ShaderPrecisionFormat) any {
 	vv, ok := v.(ShaderPrecisionFormat)
 	if !ok {
