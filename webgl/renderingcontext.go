@@ -33,6 +33,38 @@ func castToAny(value js.Value) any {
 	}
 }
 
+func makeByteArray(v []byte) js.Value {
+
+}
+
+func makeFloat32Array(v []float32) js.Value {
+
+}
+
+func makeInt32Array(v []int32) js.Value {
+
+}
+
+func makeUint32Array(v []uint32) js.Value {
+
+}
+
+func makeUintArray(v []uint) js.Value {
+
+}
+
+func makeEnumArray(v []glone.Enum) js.Value {
+
+}
+
+func makeStringArray(v []string) js.Value {
+
+}
+
+func getUintArray(v js.Value) []uint {
+
+}
+
 func (R *RenderingContext) call(method string, args ...any) js.Value {
 	if R.methods == nil {
 		R.methods = make(map[string]js.Value)
@@ -482,108 +514,108 @@ func (R *RenderingContext) Uniform4ui(location glone.UniformLocation, v0, v1, v2
 }
 
 func (R *RenderingContext) Uniform1fv(location glone.UniformLocation, v []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform1fv", l, makeFloat32Array(v))
 }
 
 func (R *RenderingContext) Uniform2fv(location glone.UniformLocation, v []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform2fv", l, makeFloat32Array(v))
 }
 
 func (R *RenderingContext) Uniform3fv(location glone.UniformLocation, v []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform3fv", l, makeFloat32Array(v))
 }
 
 func (R *RenderingContext) Uniform4fv(location glone.UniformLocation, v []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform4fv", l, makeFloat32Array(v))
 }
 
 func (R *RenderingContext) Uniform1iv(location glone.UniformLocation, v []int32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform1iv", l, makeInt32Array(v))
 }
 
 func (R *RenderingContext) Uniform2iv(location glone.UniformLocation, v []int32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform2iv", l, makeInt32Array(v))
 }
 
 func (R *RenderingContext) Uniform3iv(location glone.UniformLocation, v []int32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform3iv", l, makeInt32Array(v))
 }
 
 func (R *RenderingContext) Uniform4iv(location glone.UniformLocation, v []int32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform4iv", l, makeInt32Array(v))
 }
 
 func (R *RenderingContext) Uniform1uiv(location glone.UniformLocation, data []uint32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform1uiv", l, makeUint32Array(data))
 }
 
 func (R *RenderingContext) Uniform2uiv(location glone.UniformLocation, data []uint32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform2uiv", l, makeUint32Array(data))
 }
 
 func (R *RenderingContext) Uniform3uiv(location glone.UniformLocation, data []uint32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform3uiv", l, makeUint32Array(data))
 }
 
 func (R *RenderingContext) Uniform4uiv(location glone.UniformLocation, data []uint32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniform4uiv", l, makeUint32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix2fv(location glone.UniformLocation, transpose bool, value []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix2fv", l, transpose, makeFloat32Array(value))
 }
 
 func (R *RenderingContext) UniformMatrix3fv(location glone.UniformLocation, transpose bool, value []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix3fv", l, transpose, makeFloat32Array(value))
 }
 
 func (R *RenderingContext) UniformMatrix4fv(location glone.UniformLocation, transpose bool, value []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix4fv", l, transpose, makeFloat32Array(value))
 }
 
 func (R *RenderingContext) UniformMatrix3x2fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix3x2fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix4x2fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix4x2fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix2x3fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix2x3fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix4x3fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix4x3fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix2x4fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix2x4fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) UniformMatrix3x4fv(location glone.UniformLocation, transpose bool, data []float32) {
-	//TODO implement me
-	panic("implement me")
+	l := uniformLocationOrNil(location)
+	R.call("uniformMatrix2x4fv", l, transpose, makeFloat32Array(data))
 }
 
 func (R *RenderingContext) EnableVertexAttribArray(index uint) {
@@ -611,23 +643,19 @@ func (R *RenderingContext) VertexAttrib4f(index uint, x, y, z, w float64) {
 }
 
 func (R *RenderingContext) VertexAttrib1fv(index uint, values []float32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttrib1fv", index, makeFloat32Array(values))
 }
 
 func (R *RenderingContext) VertexAttrib2fv(index uint, values []float32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttrib2fv", index, makeFloat32Array(values))
 }
 
 func (R *RenderingContext) VertexAttrib3fv(index uint, values []float32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttrib3fv", index, makeFloat32Array(values))
 }
 
 func (R *RenderingContext) VertexAttrib4fv(index uint, values []float32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttrib4fv", index, makeFloat32Array(values))
 }
 
 func (R *RenderingContext) VertexAttribI4i(index uint, x, y, z, w int) {
@@ -639,13 +667,11 @@ func (R *RenderingContext) VertexAttribI4ui(index, x, y, z, w uint) {
 }
 
 func (R *RenderingContext) VertexAttribI4iv(index uint, values []int32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttribI4iv", index, makeInt32Array(values))
 }
 
 func (R *RenderingContext) VertexAttribI4uiv(index uint, values []uint32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("vertexAttribI4uiv", index, makeUint32Array(values))
 }
 
 func (R *RenderingContext) VertexAttribPointer(index uint, size int, typ glone.Enum, normalized bool, stride, offset int) {
@@ -696,13 +722,11 @@ func (R *RenderingContext) FramebufferTextureLayer(target, attachment glone.Enum
 }
 
 func (R *RenderingContext) InvalidateFramebuffer(target glone.Enum, attachments []glone.Enum) {
-	//TODO implement me
-	panic("implement me")
+	R.call("invalidateFramebuffer", target, makeEnumArray(attachments))
 }
 
 func (R *RenderingContext) InvalidateSubFramebuffer(target glone.Enum, attachments []glone.Enum, x, y, width, height int) {
-	//TODO implement me
-	panic("implement me")
+	R.call("invalidateSubFramebuffer", target, makeEnumArray(attachments), x, y, width, height)
 }
 
 func (R *RenderingContext) ReadBuffer(src glone.Enum) {
@@ -735,23 +759,19 @@ func (R *RenderingContext) ReadPixelsPix(x, y, width, height int, format, typ gl
 }
 
 func (R *RenderingContext) DrawBuffers(buffers []glone.Enum) {
-	//TODO implement me
-	panic("implement me")
+	R.call("drawBuffers", makeEnumArray(buffers))
 }
 
 func (R *RenderingContext) ClearBufferfv(buffer glone.Enum, drawbuffer int, values []float32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("clearBufferfv", buffer, drawbuffer, makeFloat32Array(values))
 }
 
 func (R *RenderingContext) ClearBufferiv(buffer glone.Enum, drawbuffer int, values []int32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("clearBufferiv", buffer, drawbuffer, makeInt32Array(values))
 }
 
 func (R *RenderingContext) ClearBufferuiv(buffer glone.Enum, drawbuffer int, values []uint32) {
-	//TODO implement me
-	panic("implement me")
+	R.call("clearBufferuiv", buffer, drawbuffer, makeUint32Array(values))
 }
 
 func (R *RenderingContext) ClearBufferfi(buffer glone.Enum, drawbuffer int, depth float64, stencil int) {
@@ -768,8 +788,7 @@ func (R *RenderingContext) BufferDataSrc(target glone.Enum, data glone.BufferSou
 }
 
 func (R *RenderingContext) BufferDataPix(target glone.Enum, srcData []byte, usage glone.Enum) {
-	//TODO implement me
-	panic("implement me")
+	R.call("bufferData", target, makeByteArray(srcData), usage)
 }
 
 func (R *RenderingContext) BufferSubDataSrc(target glone.Enum, offset int, data glone.BufferSource) {
@@ -778,8 +797,7 @@ func (R *RenderingContext) BufferSubDataSrc(target glone.Enum, offset int, data 
 }
 
 func (R *RenderingContext) BufferSubDataPix(target glone.Enum, dstByteOffset int, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("bufferSubData", target, dstByteOffset, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) GetBufferParameter(target, pname glone.Enum) any {
@@ -841,8 +859,7 @@ func (R *RenderingContext) TexImage2DSrc(target glone.Enum, level, internalforma
 }
 
 func (R *RenderingContext) TexImage2DPix(target glone.Enum, level, internalformat, width, height, border int, format, typ glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("texImage2D", target, level, internalformat, width, height, border, format, typ, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) TexSubImage2DPbo(target glone.Enum, level, xoffset, yoffset, width, height int, format, typ glone.Enum, pboOffset int) {
@@ -855,8 +872,7 @@ func (R *RenderingContext) TexSubImage2DSrc(target glone.Enum, level, xoffset, y
 }
 
 func (R *RenderingContext) TexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int, format, typ glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("texSubImage2D", target, level, xoffset, yoffset, width, height, format, typ, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) TexImage3DPbo(target glone.Enum, level, internalformat, width, height, depth, border int, format, typ glone.Enum, pboOffset int) {
@@ -869,8 +885,7 @@ func (R *RenderingContext) TexImage3DSrc(target glone.Enum, level, internalforma
 }
 
 func (R *RenderingContext) TexImage3DPix(target glone.Enum, level, internalformat, width, height, depth, border int, format, typ glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("texImage3D", target, level, internalformat, width, height, depth, border, format, typ, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) TexSubImage3DPbo(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format, typ glone.Enum, pboOffset int) {
@@ -883,8 +898,7 @@ func (R *RenderingContext) TexSubImage3DSrc(target glone.Enum, level, xoffset, y
 }
 
 func (R *RenderingContext) TexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format, typ glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("texSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, typ, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) CopyTexSubImage3D(target glone.Enum, level, xoffset, yoffset, zoffset, x, y, width, height int) {
@@ -896,8 +910,7 @@ func (R *RenderingContext) CompressedTexImage2DOff(target glone.Enum, level int,
 }
 
 func (R *RenderingContext) CompressedTexImage2DPix(target glone.Enum, level int, internalformat glone.Enum, width, height, border int, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("compressedTexImage2D", target, level, internalformat, width, height, border, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) CompressedTexSubImage2DOff(target glone.Enum, level, xoffset, yoffset, width, height int, format glone.Enum, imageSize, offset int) {
@@ -905,26 +918,23 @@ func (R *RenderingContext) CompressedTexSubImage2DOff(target glone.Enum, level, 
 }
 
 func (R *RenderingContext) CompressedTexSubImage2DPix(target glone.Enum, level, xoffset, yoffset, width, height int, format glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+	R.call("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) CompressedTexImage3D(target glone.Enum, level int, internalformat glone.Enum, width, height, depth, border, imageSize, offset int) {
 	R.call("compressedTexImage3D", target, level, internalformat, width, height, depth, border, imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexImage3DSrc(target glone.Enum, level int, internalformat glone.Enum, width, height, depth, border int, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+func (R *RenderingContext) CompressedTexImage3DPix(target glone.Enum, level int, internalformat glone.Enum, width, height, depth, border int, srcData []byte) {
+	R.call("compressedTexImage3D", target, level, internalformat, width, height, depth, border, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) CompressedTexSubImage3D(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format glone.Enum, imageSize, offset int) {
 	R.call("compressedTexSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, offset)
 }
 
-func (R *RenderingContext) CompressedTexSubImage3DSrc(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format glone.Enum, srcData []byte) {
-	//TODO implement me
-	panic("implement me")
+func (R *RenderingContext) CompressedTexSubImage3DPix(target glone.Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format glone.Enum, srcData []byte) {
+	R.call("compressedTexSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, makeByteArray(srcData))
 }
 
 func (R *RenderingContext) BeginQuery(target glone.Enum, query glone.Query) {
@@ -992,8 +1002,8 @@ func (R *RenderingContext) EndTransformFeedback() {
 }
 
 func (R *RenderingContext) TransformFeedbackVaryings(program glone.Program, varyings []string, bufferMode glone.Enum) {
-	//TODO implement me
-	panic("implement me")
+	p := programOrNil(program)
+	R.call("transformFeedbackVaryings", p, makeStringArray(varyings), bufferMode)
 }
 
 func (R *RenderingContext) GetTransformFeedbackVarying(program glone.Program, index uint) glone.ActiveInfo {
@@ -1016,13 +1026,13 @@ func (R *RenderingContext) GetIndexedParameter(target glone.Enum, index uint) an
 }
 
 func (R *RenderingContext) GetUniformIndices(program glone.Program, uniformNames []string) []uint {
-	//TODO implement me
-	panic("implement me")
+	p := programOrNil(program)
+	return getUintArray(R.call("getUniformIndices", p, makeStringArray(uniformNames)))
 }
 
 func (R *RenderingContext) GetActiveUniforms(program glone.Program, uniformIndices []uint, pname glone.Enum) any {
-	//TODO implement me
-	panic("implement me")
+	p := programOrNil(program)
+	return castToAny(R.call("getActiveUniforms", p, makeUintArray(uniformIndices), pname))
 }
 
 func (R *RenderingContext) GetUniformBlockIndex(program glone.Program, uniformBlockName string) uint {

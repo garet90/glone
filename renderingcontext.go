@@ -256,10 +256,10 @@ type RenderingContext interface {
 	CompressedTexSubImage2DPix(target Enum, level, xoffset, yoffset, width, height int, format Enum, srcData []byte)
 
 	CompressedTexImage3D(target Enum, level int, internalformat Enum, width, height, depth, border, imageSize, offset int)
-	CompressedTexImage3DSrc(target Enum, level int, internalformat Enum, width, height, depth, border int, srcData []byte)
+	CompressedTexImage3DPix(target Enum, level int, internalformat Enum, width, height, depth, border int, srcData []byte)
 
 	CompressedTexSubImage3D(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format Enum, imageSize, offset int)
-	CompressedTexSubImage3DSrc(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format Enum, srcData []byte)
+	CompressedTexSubImage3DPix(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int, format Enum, srcData []byte)
 
 	/* Query Methods */
 
