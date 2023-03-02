@@ -130,6 +130,8 @@ type RenderingContext interface {
 	GetUniformLocation(program Program, name string) UniformLocation
 	GetFragDataLocation(program Program, name string) int32
 	GetProgramParameter(program Program, pname Enum) any
+	TransformFeedbackVaryings(program Program, varyings []string, bufferMode Enum)
+	GetTransformFeedbackVarying(program Program, index uint32) ActiveInfo
 
 	/* Program Uniform Bindings */
 
@@ -211,11 +213,10 @@ type RenderingContext interface {
 	FramebufferTexture2D(target, attachment, textarget Enum, texture Texture, level int32)
 	CheckFramebufferStatus(target Enum) Enum
 	GetFramebufferAttachmentParameter(target, attachment, pname Enum) any
-	BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1 int32, mask, filter Enum)
 	FramebufferTextureLayer(target, attachment Enum, texture Texture, level, layer int32)
 	InvalidateFramebuffer(target Enum, attachments []Enum)
 	InvalidateSubFramebuffer(target Enum, attachments []Enum, x, y, width, height int32)
-	ReadBuffer(src Enum)
+	BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1 int32, mask, filter Enum)
 
 	/* Renderbuffer Methods */
 
@@ -226,16 +227,8 @@ type RenderingContext interface {
 
 	/* Pixel Feedback Methods */
 
-	ReadPixelsOff(x, y, width, height int32, format, typ Enum, offset int32)
+	ReadPixelsPbo(x, y, width, height int32, format, typ Enum, offset int32)
 	ReadPixelsPix(x, y, width, height int32, format, typ Enum, dstData []byte)
-
-	/* Multiple Draw Buffer Methods */
-
-	DrawBuffers(buffers []Enum)
-	ClearBufferfv(buffer Enum, drawbuffer int32, values []float32)
-	ClearBufferiv(buffer Enum, drawbuffer int32, values []int32)
-	ClearBufferuiv(buffer Enum, drawbuffer int32, values []uint32)
-	ClearBufferfi(buffer Enum, drawbuffer int32, depth float32, stencil int32)
 
 	/* Buffer Methods */
 
@@ -259,6 +252,7 @@ type RenderingContext interface {
 
 	CopyTexImage2D(target Enum, level int32, internalformat Enum, x, y, width, height, border int32)
 	CopyTexSubImage2D(target Enum, level int32, xoffset, yoffset, x, y, width, height int32)
+	CopyTexSubImage3D(target Enum, level, xoffset, yoffset, zoffset, x, y, width, height int32)
 
 	TexStorage2D(target Enum, levels int32, internalformat Enum, width, height int32)
 	TexStorage3D(target Enum, levels int32, internalformat Enum, width, height, depth int32)
@@ -278,8 +272,6 @@ type RenderingContext interface {
 	TexSubImage3DPbo(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ Enum, pboOffset int32)
 	TexSubImage3DSrc(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ Enum, source TexImageSource)
 	TexSubImage3DPix(target Enum, level, xoffset, yoffset, zoffset, width, height, depth int32, format, typ Enum, srcData []byte)
-
-	CopyTexSubImage3D(target Enum, level, xoffset, yoffset, zoffset, x, y, width, height int32)
 
 	CompressedTexImage2DSize(target Enum, level int32, internalformat Enum, width, height, border, imageSize, offset int32)
 	CompressedTexImage2DPix(target Enum, level int32, internalformat Enum, width, height, border int32, srcData []byte)
@@ -317,8 +309,6 @@ type RenderingContext interface {
 
 	BeginTransformFeedback(primitiveMode Enum)
 	EndTransformFeedback()
-	TransformFeedbackVaryings(program Program, varyings []string, bufferMode Enum)
-	GetTransformFeedbackVarying(program Program, index uint32) ActiveInfo
 	PauseTransformFeedback()
 	ResumeTransformFeedback()
 
@@ -337,6 +327,14 @@ type RenderingContext interface {
 	Viewport(x, y, width, height int32)
 	Scissor(x, y, width, height int32)
 
+	/* Clear Methods */
+
+	Clear(mask Enum)
+	ClearBufferfv(buffer Enum, drawbuffer int32, values []float32)
+	ClearBufferiv(buffer Enum, drawbuffer int32, values []int32)
+	ClearBufferuiv(buffer Enum, drawbuffer int32, values []uint32)
+	ClearBufferfi(buffer Enum, drawbuffer int32, depth float32, stencil int32)
+
 	/* State Methods */
 
 	BlendColor(red, green, blue, alpha float32)
@@ -344,7 +342,6 @@ type RenderingContext interface {
 	BlendEquationSeparate(modeRGB, modeAlpha Enum)
 	BlendFunc(sfactor, dfactor Enum)
 	BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha Enum)
-	Clear(mask Enum)
 	ClearColor(red, green, blue, alpha float32)
 	ClearDepth(depth float32)
 	ClearStencil(s int32)
@@ -367,6 +364,8 @@ type RenderingContext interface {
 	StencilOp(fail, zfail, zpass Enum)
 	StencilOpSeparate(face, fail, zfail, zpass Enum)
 	SampleCoverage(value float32, invert bool)
+	ReadBuffer(src Enum)
+	DrawBuffers(buffers []Enum)
 
 	GetParameter(pname Enum) any
 

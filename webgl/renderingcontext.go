@@ -4,7 +4,6 @@ package webgl
 
 import (
 	"gfx.cafe/ghalliday1/glone"
-	"reflect"
 	"syscall/js"
 	"unsafe"
 )
@@ -63,8 +62,8 @@ func makeByteArray(v []byte) js.Value {
 func unsafeReslice[T, U any](v []T) []U {
 	tSize := unsafe.Sizeof(*new(T))
 	uSize := unsafe.Sizeof(*new(U))
-	slice := (*reflect.SliceHeader)(unsafe.Pointer(&v))
-	return unsafe.Slice((*U)(unsafe.Pointer(slice.Data)), (int(tSize)*slice.Len)/int(uSize))
+	data := unsafe.SliceData(v)
+	return unsafe.Slice((*U)(unsafe.Pointer(data)), (int(tSize)*len(v))/int(uSize))
 }
 
 func makeFloat32Array(v []float32) js.Value {
@@ -783,10 +782,6 @@ func (R *RenderingContext) InvalidateSubFramebuffer(target glone.Enum, attachmen
 	R.call("invalidateSubFramebuffer", int32(target), makeEnumArray(attachments), x, y, width, height)
 }
 
-func (R *RenderingContext) ReadBuffer(src glone.Enum) {
-	R.call("readBuffer", int32(src))
-}
-
 func (R *RenderingContext) RenderbufferStorage(target, internalformat glone.Enum, width, height int32) {
 	R.call("renderbufferStorage", int32(target), int32(internalformat), width, height)
 }
@@ -803,7 +798,7 @@ func (R *RenderingContext) GetInternalFormatParameter(target, internalformat, pn
 	return castToAny(R.call("getInternalFormatParameter", int32(target), int32(internalformat), int32(pname)))
 }
 
-func (R *RenderingContext) ReadPixelsOff(x, y, width, height int32, format, typ glone.Enum, offset int32) {
+func (R *RenderingContext) ReadPixelsPbo(x, y, width, height int32, format, typ glone.Enum, offset int32) {
 	R.call("readPixels", x, y, width, height, int32(format), int32(typ), offset)
 }
 
@@ -1229,6 +1224,10 @@ func (R *RenderingContext) StencilOpSeparate(face, fail, zfail, zpass glone.Enum
 
 func (R *RenderingContext) SampleCoverage(value float32, invert bool) {
 	R.call("sampleCoverage", value, invert)
+}
+
+func (R *RenderingContext) ReadBuffer(src glone.Enum) {
+	R.call("readBuffer", int32(src))
 }
 
 func (R *RenderingContext) GetParameter(pname glone.Enum) any {
