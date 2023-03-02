@@ -79,7 +79,6 @@ type RenderingContext interface {
 	/* Object Type Checking */
 
 	IsBuffer(buffer Buffer) bool
-	IsEnabled(cap Enum) bool
 	IsFramebuffer(framebuffer Framebuffer) bool
 	IsProgram(program Program) bool
 	IsRenderbuffer(renderbuffer Renderbuffer) bool
@@ -353,6 +352,7 @@ type RenderingContext interface {
 	DepthRange(zNear, zFar float32)
 	Disable(cap Enum)
 	Enable(cap Enum)
+	IsEnabled(cap Enum) bool
 	Hint(target, mode Enum)
 	LineWidth(width float32)
 	PixelStorei(pname Enum, param int32)

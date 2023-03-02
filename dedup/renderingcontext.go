@@ -224,8 +224,10 @@ func (R *RenderingContext) requiresFramebufferTarget(target glone.Enum) {
 	case glone.FRAMEBUFFER:
 		R.requiresFramebuffer()
 	case glone.READ_FRAMEBUFFER:
+		R.requiresFramebuffer()
 		R.requiresReadFramebuffer()
 	case glone.DRAW_FRAMEBUFFER:
+		R.requiresFramebuffer()
 		R.requiresDrawFramebuffer()
 	}
 }
