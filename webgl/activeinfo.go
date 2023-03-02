@@ -1,7 +1,7 @@
 package webgl
 
 import (
-	"gfx.cafe/ghalliday1/glone"
+	"github.com/garet90/glone"
 	"syscall/js"
 )
 

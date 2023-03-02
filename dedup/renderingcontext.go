@@ -1,7 +1,7 @@
 package dedup
 
 import (
-	"gfx.cafe/ghalliday1/glone"
+	"github.com/garet90/glone"
 )
 
 type lazyUpdater[T comparable] struct {

@@ -1,3 +1,3 @@
-module gfx.cafe/ghalliday1/glone
+module github.com/garet90/glone
 
 go 1.20
