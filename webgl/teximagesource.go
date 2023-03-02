@@ -11,6 +11,17 @@ type TexImageSource struct {
 
 func (*TexImageSource) GLOneTexImageSource() {}
 
+func MakeTexImageSource(value js.Value) TexImageSource {
+	return TexImageSource{
+		value,
+	}
+}
+
+func NewTexImageSource(value js.Value) *TexImageSource {
+	v := MakeTexImageSource(value)
+	return &v
+}
+
 func texImageSourceOrNil(v glone.TexImageSource) any {
 	vv, ok := v.(*TexImageSource)
 	if !ok {
