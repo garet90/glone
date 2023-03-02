@@ -9,14 +9,14 @@ type Sync struct {
 	value js.Value
 }
 
-func (Sync) GLOneSync() {}
+func (*Sync) GLOneSync() {}
 
 func syncOrNil(v glone.Sync) any {
-	vv, ok := v.(Sync)
+	vv, ok := v.(*Sync)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.Sync = Sync{}
+var _ glone.Sync = (*Sync)(nil)

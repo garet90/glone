@@ -30,7 +30,9 @@ func main() {
 	width := canvas.Get("width").Int()
 	height := canvas.Get("height").Int()
 
-	gl := dedup.NewRenderingContext(webgl.NewRenderingContext(renderingContext))
+	var gl glone.RenderingContext
+	gl = webgl.NewRenderingContext(renderingContext)
+	gl = dedup.NewRenderingContext(gl)
 
 	// create shaders
 	vertex := gl.CreateShader(glone.VERTEX_SHADER)

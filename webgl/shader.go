@@ -9,14 +9,14 @@ type Shader struct {
 	value js.Value
 }
 
-func (Shader) GLOneShader() {}
+func (*Shader) GLOneShader() {}
 
 func shaderOrNil(v glone.Shader) any {
-	vv, ok := v.(Shader)
+	vv, ok := v.(*Shader)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.Shader = Shader{}
+var _ glone.Shader = (*Shader)(nil)

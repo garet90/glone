@@ -9,14 +9,14 @@ type Framebuffer struct {
 	value js.Value
 }
 
-func (Framebuffer) GLOneFramebuffer() {}
+func (*Framebuffer) GLOneFramebuffer() {}
 
 func framebufferOrNil(v glone.Framebuffer) any {
-	vv, ok := v.(Framebuffer)
+	vv, ok := v.(*Framebuffer)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.Framebuffer = Framebuffer{}
+var _ glone.Framebuffer = (*Framebuffer)(nil)

@@ -9,14 +9,14 @@ type UniformLocation struct {
 	value js.Value
 }
 
-func (UniformLocation) GLOneUniformLocation() {}
+func (*UniformLocation) GLOneUniformLocation() {}
 
 func uniformLocationOrNil(v glone.UniformLocation) any {
-	vv, ok := v.(UniformLocation)
+	vv, ok := v.(*UniformLocation)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.UniformLocation = UniformLocation{}
+var _ glone.UniformLocation = (*UniformLocation)(nil)

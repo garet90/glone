@@ -9,14 +9,14 @@ type ShaderPrecisionFormat struct {
 	value js.Value
 }
 
-func (ShaderPrecisionFormat) GLOneShaderPrecisionFormat() {}
+func (*ShaderPrecisionFormat) GLOneShaderPrecisionFormat() {}
 
 func shaderPrecisionFormatOrNil(v glone.ShaderPrecisionFormat) any {
-	vv, ok := v.(ShaderPrecisionFormat)
+	vv, ok := v.(*ShaderPrecisionFormat)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.ShaderPrecisionFormat = ShaderPrecisionFormat{}
+var _ glone.ShaderPrecisionFormat = (*ShaderPrecisionFormat)(nil)

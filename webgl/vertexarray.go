@@ -9,14 +9,14 @@ type VertexArray struct {
 	value js.Value
 }
 
-func (VertexArray) GLOneVertexArray() {}
+func (*VertexArray) GLOneVertexArray() {}
 
 func vertexArrayOrNil(v glone.VertexArray) any {
-	vv, ok := v.(VertexArray)
+	vv, ok := v.(*VertexArray)
 	if !ok {
 		return nil
 	}
 	return vv.value
 }
 
-var _ glone.VertexArray = VertexArray{}
+var _ glone.VertexArray = (*VertexArray)(nil)

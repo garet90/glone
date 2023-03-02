@@ -119,7 +119,7 @@ func getShaderArray(v js.Value) []glone.Shader {
 	length := v.Get("length").Int()
 	array := make([]glone.Shader, length)
 	for i := 0; i < length; i++ {
-		array[i] = Shader{
+		array[i] = &Shader{
 			v.Index(i),
 		}
 	}
@@ -146,7 +146,7 @@ func (R *RenderingContext) CreateBuffer() glone.Buffer {
 	if v.IsNull() {
 		return nil
 	}
-	return Buffer{v}
+	return &Buffer{v}
 }
 
 func (R *RenderingContext) CreateFramebuffer() glone.Framebuffer {
@@ -154,7 +154,7 @@ func (R *RenderingContext) CreateFramebuffer() glone.Framebuffer {
 	if v.IsNull() {
 		return nil
 	}
-	return Framebuffer{v}
+	return &Framebuffer{v}
 }
 
 func (R *RenderingContext) CreateProgram() glone.Program {
@@ -162,7 +162,7 @@ func (R *RenderingContext) CreateProgram() glone.Program {
 	if v.IsNull() {
 		return nil
 	}
-	return Program{v}
+	return &Program{v}
 }
 
 func (R *RenderingContext) CreateRenderbuffer() glone.Renderbuffer {
@@ -170,7 +170,7 @@ func (R *RenderingContext) CreateRenderbuffer() glone.Renderbuffer {
 	if v.IsNull() {
 		return nil
 	}
-	return Renderbuffer{v}
+	return &Renderbuffer{v}
 }
 
 func (R *RenderingContext) CreateShader(typ glone.Enum) glone.Shader {
@@ -178,7 +178,7 @@ func (R *RenderingContext) CreateShader(typ glone.Enum) glone.Shader {
 	if v.IsNull() {
 		return nil
 	}
-	return Shader{v}
+	return &Shader{v}
 }
 
 func (R *RenderingContext) CreateTexture() glone.Texture {
@@ -186,7 +186,7 @@ func (R *RenderingContext) CreateTexture() glone.Texture {
 	if v.IsNull() {
 		return nil
 	}
-	return Texture{v}
+	return &Texture{v}
 }
 
 func (R *RenderingContext) CreateVertexArray() glone.VertexArray {
@@ -194,7 +194,7 @@ func (R *RenderingContext) CreateVertexArray() glone.VertexArray {
 	if v.IsNull() {
 		return nil
 	}
-	return VertexArray{v}
+	return &VertexArray{v}
 }
 
 func (R *RenderingContext) CreateTransformFeedback() glone.TransformFeedback {
@@ -202,7 +202,7 @@ func (R *RenderingContext) CreateTransformFeedback() glone.TransformFeedback {
 	if v.IsNull() {
 		return nil
 	}
-	return TransformFeedback{v}
+	return &TransformFeedback{v}
 }
 
 func (R *RenderingContext) CreateSampler() glone.Sampler {
@@ -210,7 +210,7 @@ func (R *RenderingContext) CreateSampler() glone.Sampler {
 	if v.IsNull() {
 		return nil
 	}
-	return Sampler{v}
+	return &Sampler{v}
 }
 
 func (R *RenderingContext) CreateQuery() glone.Query {
@@ -218,7 +218,7 @@ func (R *RenderingContext) CreateQuery() glone.Query {
 	if v.IsNull() {
 		return nil
 	}
-	return Query{v}
+	return &Query{v}
 }
 
 func (R *RenderingContext) BindAttribLocation(program glone.Program, index uint32, name string) {
@@ -410,7 +410,7 @@ func (R *RenderingContext) GetShaderParameter(shader glone.Shader, pname glone.E
 }
 
 func (R *RenderingContext) GetShaderPrecisionFormat(shadertype, precisiontype glone.Enum) glone.ShaderPrecisionFormat {
-	return ShaderPrecisionFormat{
+	return &ShaderPrecisionFormat{
 		R.call("getShaderPrecisionFormat", int32(shadertype), int32(precisiontype)),
 	}
 }
@@ -453,14 +453,14 @@ func (R *RenderingContext) UseProgram(program glone.Program) {
 
 func (R *RenderingContext) GetActiveAttrib(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
-	return ActiveInfo{
+	return &ActiveInfo{
 		R.call("getActiveAttrib", p, index),
 	}
 }
 
 func (R *RenderingContext) GetActiveUniform(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
-	return ActiveInfo{
+	return &ActiveInfo{
 		R.call("getActiveUniform", p, index),
 	}
 }
@@ -492,7 +492,7 @@ func (R *RenderingContext) GetUniform(program glone.Program, location glone.Unif
 
 func (R *RenderingContext) GetUniformLocation(program glone.Program, name string) glone.UniformLocation {
 	p := programOrNil(program)
-	return UniformLocation{
+	return &UniformLocation{
 		R.call("getUniformLocation", p, name),
 	}
 }
@@ -1003,7 +1003,7 @@ func (R *RenderingContext) EndQuery(target glone.Enum) {
 }
 
 func (R *RenderingContext) GetQuery(target, pname glone.Enum) glone.Query {
-	return Query{
+	return &Query{
 		R.call("getQuery", int32(target), int32(pname)),
 	}
 }
@@ -1029,7 +1029,7 @@ func (R *RenderingContext) GetSamplerParameter(sampler glone.Sampler, pname glon
 }
 
 func (R *RenderingContext) FenceSync(condition, flags glone.Enum) glone.Sync {
-	return Sync{
+	return &Sync{
 		R.call("fenceSync", int32(condition), int32(flags)),
 	}
 }
@@ -1064,7 +1064,7 @@ func (R *RenderingContext) TransformFeedbackVaryings(program glone.Program, vary
 
 func (R *RenderingContext) GetTransformFeedbackVarying(program glone.Program, index uint32) glone.ActiveInfo {
 	p := programOrNil(program)
-	return ActiveInfo{
+	return &ActiveInfo{
 		R.call("getTransformFeedbackVarying", p, index),
 	}
 }
