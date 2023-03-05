@@ -45,7 +45,7 @@ type RenderingContext struct {
 	drawFramebufferBinding         lazyUpdater[glone.Framebuffer]
 	readFramebufferBinding         lazyUpdater[glone.Framebuffer]
 	renderbufferBinding            lazyUpdater[glone.Renderbuffer]
-	vertexArrayBinding             lazyUpdater[glone.VertexArray]
+	vertexArrayBinding             lazyUpdater[*VertexArray]
 	programBinding                 lazyUpdater[glone.Program]
 	transformFeedbackBinding       lazyUpdater[glone.TransformFeedback]
 	activeTexture                  lazyUpdater[int]
@@ -63,20 +63,42 @@ func NewRenderingContext(context glone.RenderingContext) *RenderingContext {
 	return &rc
 }
 
+func (R *RenderingContext) CreateVertexArray() glone.VertexArray {
+	return newVertexArray(R.RenderingContext.CreateVertexArray())
+}
+
+func (R *RenderingContext) arrayBufferTarget() *lazyUpdater[glone.Buffer] {
+	R.requiresVertexArray()
+	if R.vertexArrayBinding.current != nil {
+		return &R.vertexArrayBinding.current.arrayBufferBinding
+	}
+	return &R.arrayBufferBinding
+}
+
+func (R *RenderingContext) elementArrayBufferTarget() *lazyUpdater[glone.Buffer] {
+	R.requiresVertexArray()
+	if R.vertexArrayBinding.current != nil {
+		return &R.vertexArrayBinding.current.elementArrayBufferBinding
+	}
+	return &R.elementArrayBufferBinding
+}
+
 func (R *RenderingContext) requiresArrayBuffer() {
-	if R.arrayBufferBinding.isCurrent() {
+	binding := R.arrayBufferTarget()
+	if binding.isCurrent() {
 		return
 	}
-	R.RenderingContext.BindBuffer(glone.ARRAY_BUFFER, R.arrayBufferBinding.target)
-	R.arrayBufferBinding.makeCurrent()
+	R.RenderingContext.BindBuffer(glone.ARRAY_BUFFER, binding.target)
+	binding.makeCurrent()
 }
 
 func (R *RenderingContext) requiresElementArrayBuffer() {
-	if R.elementArrayBufferBinding.isCurrent() {
+	binding := R.elementArrayBufferTarget()
+	if binding.isCurrent() {
 		return
 	}
-	R.RenderingContext.BindBuffer(glone.ELEMENT_ARRAY_BUFFER, R.elementArrayBufferBinding.target)
-	R.elementArrayBufferBinding.makeCurrent()
+	R.RenderingContext.BindBuffer(glone.ELEMENT_ARRAY_BUFFER, binding.target)
+	binding.makeCurrent()
 }
 
 func (R *RenderingContext) requiresCopyReadBuffer() {
@@ -151,9 +173,9 @@ func (R *RenderingContext) requiresBufferTarget(target glone.Enum) {
 func (R *RenderingContext) BindBuffer(target glone.Enum, buffer glone.Buffer) {
 	switch target {
 	case glone.ARRAY_BUFFER:
-		R.arrayBufferBinding.target = buffer
+		R.arrayBufferTarget().target = buffer
 	case glone.ELEMENT_ARRAY_BUFFER:
-		R.elementArrayBufferBinding.target = buffer
+		R.elementArrayBufferTarget().target = buffer
 	case glone.COPY_READ_BUFFER:
 		R.copyReadBufferBinding.target = buffer
 	case glone.COPY_WRITE_BUFFER:
@@ -269,7 +291,7 @@ func (R *RenderingContext) requiresVertexArray() {
 	if R.vertexArrayBinding.isCurrent() {
 		return
 	}
-	R.RenderingContext.BindVertexArray(R.vertexArrayBinding.target)
+	R.RenderingContext.BindVertexArray(R.vertexArrayBinding.target.child())
 	R.vertexArrayBinding.makeCurrent()
 }
 
@@ -354,7 +376,7 @@ func (R *RenderingContext) BindTexture(target glone.Enum, texture glone.Texture)
 }
 
 func (R *RenderingContext) BindVertexArray(array glone.VertexArray) {
-	R.vertexArrayBinding.target = array
+	R.vertexArrayBinding.target = vertexArrayOrNil(array)
 }
 
 func (R *RenderingContext) requiresTransformFeedback() {
@@ -402,6 +424,15 @@ func (R *RenderingContext) requiresSampler() {
 
 func (R *RenderingContext) BindSampler(unit uint32, sampler glone.Sampler) {
 	R.getTextureUnit(int(unit)).samplerBinding.target = sampler
+}
+
+func (R *RenderingContext) IsVertexArray(vertexArray glone.VertexArray) bool {
+	return R.RenderingContext.IsVertexArray(vertexArrayOrNil(vertexArray).child())
+}
+
+func (R *RenderingContext) DeleteVertexArray(vertexArray glone.VertexArray) {
+	// TODO unbind
+	R.RenderingContext.DeleteVertexArray(vertexArrayOrNil(vertexArray).child())
 }
 
 func (R *RenderingContext) requiresProgram() {
