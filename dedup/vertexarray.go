@@ -5,7 +5,6 @@ import "github.com/garet90/glone"
 type VertexArray struct {
 	glone.VertexArray
 
-	arrayBufferBinding        lazyUpdater[glone.Buffer]
 	elementArrayBufferBinding lazyUpdater[glone.Buffer]
 }
 

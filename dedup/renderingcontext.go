@@ -67,14 +67,6 @@ func (R *RenderingContext) CreateVertexArray() glone.VertexArray {
 	return newVertexArray(R.RenderingContext.CreateVertexArray())
 }
 
-func (R *RenderingContext) arrayBufferTarget() *lazyUpdater[glone.Buffer] {
-	R.requiresVertexArray()
-	if R.vertexArrayBinding.current != nil {
-		return &R.vertexArrayBinding.current.arrayBufferBinding
-	}
-	return &R.arrayBufferBinding
-}
-
 func (R *RenderingContext) elementArrayBufferTarget() *lazyUpdater[glone.Buffer] {
 	R.requiresVertexArray()
 	if R.vertexArrayBinding.current != nil {
@@ -84,12 +76,11 @@ func (R *RenderingContext) elementArrayBufferTarget() *lazyUpdater[glone.Buffer]
 }
 
 func (R *RenderingContext) requiresArrayBuffer() {
-	binding := R.arrayBufferTarget()
-	if binding.isCurrent() {
+	if R.arrayBufferBinding.isCurrent() {
 		return
 	}
-	R.RenderingContext.BindBuffer(glone.ARRAY_BUFFER, binding.target)
-	binding.makeCurrent()
+	R.RenderingContext.BindBuffer(glone.ARRAY_BUFFER, R.arrayBufferBinding.target)
+	R.arrayBufferBinding.makeCurrent()
 }
 
 func (R *RenderingContext) requiresElementArrayBuffer() {
@@ -173,7 +164,7 @@ func (R *RenderingContext) requiresBufferTarget(target glone.Enum) {
 func (R *RenderingContext) BindBuffer(target glone.Enum, buffer glone.Buffer) {
 	switch target {
 	case glone.ARRAY_BUFFER:
-		R.arrayBufferTarget().target = buffer
+		R.arrayBufferBinding.target = buffer
 	case glone.ELEMENT_ARRAY_BUFFER:
 		R.elementArrayBufferTarget().target = buffer
 	case glone.COPY_READ_BUFFER:
